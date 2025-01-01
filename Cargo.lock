@@ -869,6 +869,7 @@ name = "tcplane"
 version = "0.0.1"
 dependencies = [
  "color-output",
+ "http-constant",
  "http-request",
  "http-type 2.3.0",
  "hyperlane-log",

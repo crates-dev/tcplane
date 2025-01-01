@@ -1,3 +1,5 @@
+use crate::utils::list::remove_trailing_zeros;
+
 use super::{
     config::r#type::ServerConfig, controller_data::r#type::ControllerData, error::r#type::Error,
     func::r#type::FuncArcLock, middleware::r#type::MiddlewareArcLock, r#type::Server,
@@ -25,9 +27,12 @@ impl Server {
         Self::default()
     }
 
-    pub fn host(&mut self, host: &'static str) -> &mut Self {
+    pub fn host<T>(&mut self, host: T) -> &mut Self
+    where
+        T: Into<String>,
+    {
         let _ = self.get_cfg().write().and_then(|mut cfg| {
-            cfg.set_host(host);
+            cfg.set_host(host.into());
             Ok(())
         });
         self
@@ -49,13 +54,16 @@ impl Server {
         self
     }
 
-    pub fn log_dir(&mut self, log_dir: &'static str) -> &mut Self {
+    pub fn log_dir<T>(&mut self, log_dir: T) -> &mut Self
+    where
+        T: Into<String> + Clone,
+    {
         let _ = self.get_cfg().write().and_then(|mut cfg| {
-            cfg.set_log_dir(log_dir);
+            cfg.set_log_dir(log_dir.clone().into());
             Ok(())
         });
         let _ = self.get_tmp().write().and_then(|mut tmp| {
-            tmp.log.set_path(log_dir.into());
+            tmp.log.set_path(log_dir.clone().into());
             Ok(())
         });
         self
@@ -103,16 +111,16 @@ impl Server {
 
     fn handle_stream(&self, mut stream: &TcpStream) -> Vec<u8> {
         let mut buffer: Vec<u8> = Vec::new();
-        let buffer_size: usize = self
-            .get_cfg()
-            .read()
-            .and_then(|data| Ok(data.get_buffer_size().clone()))
-            .unwrap_or_default();
-        let mut tmp_buf: Vec<u8> = vec![0u8; buffer_size];
+        let mut tmp_buf: Vec<u8> = vec![0u8; 100];
         loop {
             match stream.read(&mut tmp_buf) {
                 Ok(n) => {
+                    tmp_buf = remove_trailing_zeros(&mut tmp_buf);
                     if n == 0 {
+                        break;
+                    }
+                    if tmp_buf.ends_with(HTTP_DOUBLE_BR_BYTES) {
+                        buffer.extend_from_slice(&tmp_buf[..n - HTTP_DOUBLE_BR_BYTES.len()]);
                         break;
                     }
                     buffer.extend_from_slice(&tmp_buf[..n]);
@@ -127,11 +135,11 @@ impl Server {
 
     pub fn listen(&mut self) -> &mut Self {
         self.init();
-        let mut host: &str = EMPTY_STR;
+        let mut host: String = EMPTY_STR.to_owned();
         let mut port: usize = usize::default();
         let mut thread_pool_size: usize = usize::default();
         let _ = self.get_cfg().read().and_then(|cfg| {
-            host = cfg.get_host();
+            host = cfg.get_host().to_owned();
             port = *cfg.get_port();
             thread_pool_size = *cfg.get_thread_pool_size();
             Ok(())
@@ -167,7 +175,7 @@ impl Server {
                     let mut controller_data: ControllerData = ControllerData::new();
                     controller_data
                         .set_stream(Some(stream_arc.clone()))
-                        .set_response(Some(vec![]))
+                        .set_response(super::response::r#type::Response { data: Some(vec![]) })
                         .set_request(Some(request))
                         .set_log(log);
                     if let Ok(middleware_guard) = middleware_arc.read() {
