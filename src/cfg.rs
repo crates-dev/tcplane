@@ -55,7 +55,7 @@ fn test_server_basic_usage() {
             let res = controller_data
                 .get_response()
                 .clone()
-                .data("hello world".as_bytes().to_vec())
+                .data("hello world")
                 .send(&stream);
             controller_data.get_log().log_debug(
                 format!(

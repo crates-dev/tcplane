@@ -11,8 +11,11 @@ impl Default for Response {
 }
 
 impl Response {
-    pub fn data(&mut self, data: Vec<u8>) -> &mut Self {
-        self.set_data(Some(data));
+    pub fn data<T>(&mut self, data: T) -> &mut Self
+    where
+        T: Into<Vec<u8>>,
+    {
+        self.set_data(Some(data.into()));
         self
     }
 

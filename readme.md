@@ -75,11 +75,17 @@ fn run_server() {
             .peer_addr()
             .and_then(|host| Ok(host.to_string()))
             .unwrap_or("Unknown".to_owned());
+        let res = controller_data
+            .get_response()
+            .clone()
+            .data("hello world")
+            .send(&stream);
         controller_data.get_log().log_debug(
             format!(
-                "Request host => {}\n{:#?}",
+                "Request host => {}\n{:#?}\n{:?}",
                 host,
-                String::from_utf8_lossy(&request)
+                String::from_utf8_lossy(&request),
+                res.unwrap().unwrap()
             ),
             common_log,
         );
