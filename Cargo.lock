@@ -462,9 +462,9 @@ dependencies = [
 
 [[package]]
 name = "tcp-request"
-version = "0.0.3"
+version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "293511cbfc122f45e8244df8330965dcd7f2da8ed90023c860cbdfcd9931cffb"
+checksum = "ac9b4e1911d499a62d388b2fe6d7494f6c229702aac4449582a3d3d6ee8830b7"
 dependencies = [
  "http-type",
  "lombok-macros",
