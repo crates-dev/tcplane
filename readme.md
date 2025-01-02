@@ -70,7 +70,14 @@ fn run_server() {
     server.log_size(1_024_000);
     server.buffer_size(1_024_000);
     server.middleware(|controller_data| {
-        let request: Vec<u8> = controller_data.get_request().clone().unwrap();
+        {
+            let request: &mut Vec<u8> = controller_data.get_mut_request();
+            let mut new_request: Vec<u8> = request.clone();
+            let ext: Vec<u8> = "test".as_bytes().to_vec();
+            new_request.extend(ext);
+            *request = new_request;
+        }
+        let request: Vec<u8> = controller_data.get_request().clone();
         let stream: ControllerDataStream = controller_data.get_stream().clone().unwrap();
         let host: String = stream
             .peer_addr()

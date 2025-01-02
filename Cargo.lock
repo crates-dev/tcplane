@@ -472,7 +472,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "0.0.5"
+version = "0.0.6"
 dependencies = [
  "color-output",
  "http-constant",

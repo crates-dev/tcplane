@@ -184,7 +184,7 @@ impl Server {
                     controller_data
                         .set_stream(Some(stream_arc.clone()))
                         .set_response(super::response::r#type::Response { data: Some(vec![]) })
-                        .set_request(Some(request))
+                        .set_request(request)
                         .set_log(log);
                     if let Ok(middleware_guard) = middleware_arc.read() {
                         for middleware in middleware_guard.iter() {
