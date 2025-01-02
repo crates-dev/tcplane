@@ -68,6 +68,7 @@ fn run_server() {
     server.thread_pool_size(10);
     server.log_dir("./logs");
     server.log_size(1_024_000);
+    server.buffer_size(1_024_000);
     server.middleware(|controller_data| {
         let request: Vec<u8> = controller_data.get_request().clone().unwrap();
         let stream: ControllerDataStream = controller_data.get_stream().clone().unwrap();

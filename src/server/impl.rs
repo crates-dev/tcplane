@@ -110,16 +110,24 @@ impl Server {
     }
 
     fn handle_stream(&self, mut stream: &TcpStream) -> Vec<u8> {
+        let buffer_size: usize = self
+            .get_cfg()
+            .read()
+            .and_then(|cfg| Ok(cfg.get_buffer_size().clone()))
+            .unwrap_or_default()
+            .max(HTTP_DOUBLE_BR_BYTES.len());
         let mut buffer: Vec<u8> = Vec::new();
-        let mut tmp_buf: Vec<u8> = vec![0u8; 100];
+        let mut tmp_buf: Vec<u8> = vec![0u8; buffer_size];
         loop {
             match stream.read(&mut tmp_buf) {
                 Ok(n) => {
+                    let old_len: usize = tmp_buf.len();
                     tmp_buf = remove_trailing_zeros(&mut tmp_buf);
+                    let new_len: usize = tmp_buf.len();
                     if n == 0 {
                         break;
                     }
-                    if tmp_buf.ends_with(HTTP_DOUBLE_BR_BYTES) {
+                    if old_len != new_len || tmp_buf.ends_with(HTTP_DOUBLE_BR_BYTES) {
                         buffer.extend_from_slice(&tmp_buf[..n - HTTP_DOUBLE_BR_BYTES.len()]);
                         break;
                     }

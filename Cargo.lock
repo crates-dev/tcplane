@@ -102,18 +102,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
-name = "http-compress"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1d1bf4f3f98b624c70b0c198ed712e504cf1ab786b07be420d359906a55220a"
-dependencies = [
- "brotli",
- "flate2",
- "http-constant",
- "http-type 1.7.0",
-]
-
-[[package]]
 name = "http-constant"
 version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -121,21 +109,6 @@ checksum = "575c969c477caf7b72882752e3253b78f312205379a1622fb550bbf6fc7f9408"
 dependencies = [
  "brotli",
  "flate2",
-]
-
-[[package]]
-name = "http-type"
-version = "1.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ff3da75d68d4527144e6edca4bfbe360a02c73f6fdee9677254540e8589292c"
-dependencies = [
- "hex",
- "http-constant",
- "serde",
- "serde-xml-rs",
- "serde_json",
- "serde_urlencoded",
- "url",
 ]
 
 [[package]]
@@ -160,7 +133,7 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4e545907f03d6a1d86e9cbc8c6272f4f1d40b42703a73cd8b309f6854a65cf7"
 dependencies = [
- "http-type 2.3.0",
+ "http-type",
  "hyperlane-time",
  "lazy_static",
  "lombok-macros",
@@ -489,22 +462,21 @@ dependencies = [
 
 [[package]]
 name = "tcp-request"
-version = "0.0.1"
+version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fc00e3f1692c50d4c5daa2c4bde9201000a68b3e2604d53167b0a8e742126d2"
+checksum = "d627c7ad52ba34bf16154d55e43676d4c6a2480dfabf5f405d1f0ea2943c4389"
 dependencies = [
- "http-compress",
- "http-type 2.3.0",
+ "http-type",
  "lombok-macros",
 ]
 
 [[package]]
 name = "tcplane"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "color-output",
  "http-constant",
- "http-type 2.3.0",
+ "http-type",
  "hyperlane-log",
  "hyperlane-time",
  "lombok-macros",
