@@ -71,7 +71,7 @@ fn test_server_basic_usage() {
                     "Request host => {}\n{:#?}\n{:?}",
                     host,
                     String::from_utf8_lossy(&request),
-                    res.unwrap().unwrap()
+                    res.unwrap()
                 ),
                 common_log,
             );

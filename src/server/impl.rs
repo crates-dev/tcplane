@@ -183,7 +183,7 @@ impl Server {
                     let mut controller_data: ControllerData = ControllerData::new();
                     controller_data
                         .set_stream(Some(stream_arc.clone()))
-                        .set_response(super::response::r#type::Response { data: Some(vec![]) })
+                        .set_response(super::response::r#type::Response { data: vec![] })
                         .set_request(request)
                         .set_log(log);
                     if let Ok(middleware_guard) = middleware_arc.read() {
