@@ -1,12 +1,12 @@
 use super::r#type::ControllerData;
-use crate::{server::response::r#type::Response, ControllerDataRequest};
+use crate::server::{request::r#type::Request, response::r#type::Response};
 use hyperlane_log::*;
 
 impl ControllerData {
     pub fn new() -> Self {
         ControllerData {
             stream: None,
-            request: ControllerDataRequest::new(),
+            request: Request::new(),
             response: Response::default(),
             log: Log::default(),
         }
