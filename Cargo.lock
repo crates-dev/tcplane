@@ -103,9 +103,9 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "http-constant"
-version = "1.16.0"
+version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "575c969c477caf7b72882752e3253b78f312205379a1622fb550bbf6fc7f9408"
+checksum = "969d4b99fe1df37425d5961738eb365565f05bb823e11beae5b270339ec82afd"
 dependencies = [
  "brotli",
  "flate2",
@@ -113,9 +113,9 @@ dependencies = [
 
 [[package]]
 name = "http-type"
-version = "2.13.0"
+version = "2.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2328364a5d68f9f246d1d818cfdc71caf9194a88d494bd68106ff8f6aef1027e"
+checksum = "4507671cabe68bc93a87fc723461ba075b06566dcc44084688397708a5cab35e"
 dependencies = [
  "hex",
  "http-constant",
@@ -129,9 +129,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-log"
-version = "0.10.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e1dc7c4ab73d690aa7c5dc448147ccbeb82d7a7ab7d8cfea65c50fac1b1727f"
+checksum = "19d14c77634da63ccdc35f9d49cde4aa4788cf4ea0501d3ca02498ea7eec3866"
 dependencies = [
  "http-type",
  "hyperlane-time",
@@ -462,9 +462,9 @@ dependencies = [
 
 [[package]]
 name = "tcp-request"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e3ce70b855ff2ae61a05cb0fce7d34bb7d9fb7c1e292d74112f36c2152cd95e"
+checksum = "f44c1d473a0390220be35e45a4e01ee88725b74d7ee7402a779b1f64435c2196"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -472,7 +472,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "1.10.0"
+version = "1.11.0"
 dependencies = [
  "color-output",
  "http-constant",
