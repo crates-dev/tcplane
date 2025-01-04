@@ -113,9 +113,9 @@ dependencies = [
 
 [[package]]
 name = "http-type"
-version = "2.12.0"
+version = "2.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8364187d49becf16da08b7acca7da79987b33c2eb52d07875238a17f556cac1"
+checksum = "2328364a5d68f9f246d1d818cfdc71caf9194a88d494bd68106ff8f6aef1027e"
 dependencies = [
  "hex",
  "http-constant",
@@ -129,9 +129,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-log"
-version = "0.8.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e0d969691b67c5a01abd31f5d8837add277083f32847ad22da9dec18c36e2f2"
+checksum = "5e1dc7c4ab73d690aa7c5dc448147ccbeb82d7a7ab7d8cfea65c50fac1b1727f"
 dependencies = [
  "http-type",
  "hyperlane-time",
@@ -462,9 +462,9 @@ dependencies = [
 
 [[package]]
 name = "tcp-request"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7da831906f3ad60460c21a46dea5b84a5c298dcaedcda75b6a6cb0bd1035a634"
+checksum = "2e3ce70b855ff2ae61a05cb0fce7d34bb7d9fb7c1e292d74112f36c2152cd95e"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -472,7 +472,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "1.5.0"
+version = "1.6.0"
 dependencies = [
  "color-output",
  "http-constant",
