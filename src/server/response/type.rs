@@ -1,10 +1,10 @@
 use super::error::Error;
-use lombok_macros::*;
+use crate::*;
 
-pub type ControllerDataResponse = Vec<u8>;
-pub type ResponseResult = Result<ControllerDataResponse, Error>;
+pub type ResponseData = Vec<u8>;
+pub type ResponseResult = Result<ResponseData, Error>;
 
 #[derive(Clone, Debug, Lombok)]
 pub struct Response {
-    pub(crate) data: ControllerDataResponse,
+    pub(crate) data: ResponseData,
 }

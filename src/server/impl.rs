@@ -1,15 +1,12 @@
-use crate::utils::list::remove_trailing_zeros;
-
 use super::{
     config::r#type::ServerConfig, controller_data::r#type::ControllerData, error::r#type::Error,
     func::r#type::FuncArcLock, middleware::r#type::MiddlewareArcLock, r#type::Server,
     thread_pool::r#type::ThreadPool, tmp::r#type::Tmp,
 };
+use crate::utils::list::remove_trailing_zeros;
+use crate::*;
 use http_type::*;
-use hyperlane_log::*;
-use hyperlane_time::*;
 use std::io::Read;
-use std_macro_extensions::*;
 
 impl Default for Server {
     fn default() -> Self {
@@ -201,7 +198,14 @@ impl Server {
                 });
                 if let Err(err) = thread_result {
                     let _ = tmp_arc.read().and_then(|tem| {
-                        tem.get_log().log_error(format!("{:?}", err), |data| {
+                        let err_str: &str = if let Some(msg) = err.downcast_ref::<&str>() {
+                            msg
+                        } else if let Some(msg) = err.downcast_ref::<String>() {
+                            msg
+                        } else {
+                            &format!("{:#?}", err)
+                        };
+                        tem.get_log().log_error(format!("{}", err_str), |data| {
                             format!("{}: {}{}", current_time(), data.to_string(), HTTP_BR)
                         });
                         Ok(())

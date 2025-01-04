@@ -1,5 +1,5 @@
 use super::error::Error;
-use super::r#type::{Response, ResponseResult};
+use crate::*;
 use std::{io::Write, net::TcpStream};
 
 impl Default for Response {

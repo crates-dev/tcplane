@@ -1,6 +1,6 @@
 use super::{config::r#type::ServerConfig, func::r#type::FuncBox, tmp::r#type::Tmp};
+use crate::*;
 use http_type::ArcRwLock;
-use lombok_macros::Lombok;
 
 #[derive(Clone, Lombok)]
 pub struct Server {
