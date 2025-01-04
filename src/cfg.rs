@@ -53,29 +53,26 @@ fn test_server_basic_usage() {
                 .peer_addr()
                 .and_then(|host| Ok(host.to_string()))
                 .unwrap_or("Unknown".to_owned());
-            let res: ResponseResult = controller_data
-                .get_response()
-                .clone()
-                .data("hello world")
-                .send(&stream);
+
             controller_data.get_log().log_debug(
                 format!(
-                    "Request host => {}\n{:#?}\n{:?}",
+                    "Request host => {}\n{:#?}\n",
                     host,
                     String::from_utf8_lossy(&request),
-                    res.unwrap()
                 ),
                 common_log,
             );
         });
 
         server.func(|controller_data| {
-            let response: &Response = controller_data.get_response();
+            let stream: ControllerDataStream = controller_data.get_stream().clone().unwrap();
+            let res: ResponseResult = controller_data
+                .get_response()
+                .clone()
+                .data("hello world")
+                .send(&stream);
             controller_data.get_log().log_debug(
-                format!(
-                    "Response => {:?}\n",
-                    String::from_utf8_lossy(response.get_data())
-                ),
+                format!("Response => {:?}\n", String::from_utf8_lossy(&res.unwrap())),
                 common_log,
             );
         });
