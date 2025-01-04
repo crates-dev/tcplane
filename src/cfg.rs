@@ -48,7 +48,7 @@ fn test_server_basic_usage() {
                 *request = new_request;
             }
             let request: Request = controller_data.get_request().clone();
-            let stream: ControllerDataStream = controller_data.get_stream().clone().unwrap();
+            let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
             let host: String = stream
                 .peer_addr()
                 .and_then(|host| Ok(host.to_string()))
@@ -65,7 +65,7 @@ fn test_server_basic_usage() {
         });
 
         server.func(|controller_data| {
-            let stream: ControllerDataStream = controller_data.get_stream().clone().unwrap();
+            let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
             let res: ResponseResult = controller_data
                 .get_response()
                 .clone()
