@@ -68,6 +68,17 @@ fn test_server_basic_usage() {
                 common_log,
             );
         });
+
+        server.func(|controller_data| {
+            let response: &Response = controller_data.get_response();
+            controller_data.get_log().log_debug(
+                format!(
+                    "Response => {:?}\n",
+                    String::from_utf8_lossy(response.get_data())
+                ),
+                common_log,
+            );
+        });
         server.listen();
     }
 
