@@ -462,9 +462,9 @@ dependencies = [
 
 [[package]]
 name = "tcp-request"
-version = "0.8.0"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26db6e330fad58acf0bc596629de673d5ae4fb0de22a6514d5ee3ce17c118169"
+checksum = "3c2736629e8eb07a778af672ef27b7d422d2560287dc40a7139d05378af04536"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -472,7 +472,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "1.16.0"
+version = "1.17.0"
 dependencies = [
  "color-output",
  "http-constant",
