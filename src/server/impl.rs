@@ -9,6 +9,7 @@ use http_type::*;
 use std::io::Read;
 
 impl Default for Server {
+    #[inline]
     fn default() -> Self {
         Self {
             cfg: Arc::new(RwLock::new(ServerConfig::default())),
