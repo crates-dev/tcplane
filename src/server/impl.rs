@@ -86,7 +86,7 @@ impl Server {
     }
 
     #[inline]
-    pub fn buffer_size(&mut self, buffer_size: usize) -> &mut Self {
+    pub fn buffer(&mut self, buffer_size: usize) -> &mut Self {
         let _ = self.get_cfg().write().and_then(|mut cfg| {
             cfg.set_buffer_size(buffer_size);
             Ok(())

@@ -60,7 +60,7 @@ fn run_server() {
     server.thread_pool_size(10);
     server.log_dir("./logs");
     server.log_size(1_024_000);
-    server.buffer_size(1_024_000);
+    server.buffer(1_024_000);
     server.middleware(|controller_data| {
         {
             let request: &mut Vec<u8> = controller_data.get_mut_request();
