@@ -1,6 +1,7 @@
 use crate::*;
 
 impl ControllerData {
+    #[inline]
     pub fn new() -> Self {
         ControllerData {
             stream: None,

@@ -5,6 +5,7 @@ use http_type::ArcMutex;
 use std::sync::mpsc::{self, Receiver};
 
 impl ThreadPool {
+    #[inline]
     pub fn new(size: usize) -> ThreadPool {
         let (sender, receiver) = mpsc::channel();
         let receiver: ArcMutex<Receiver<Box<dyn FnOnce() + Send>>> = Arc::new(Mutex::new(receiver));
@@ -15,6 +16,7 @@ impl ThreadPool {
         ThreadPool { workers, sender }
     }
 
+    #[inline]
     pub fn execute<F>(&self, job: F)
     where
         F: FnOnce() + Send + 'static,

@@ -20,10 +20,12 @@ impl Default for Server {
 }
 
 impl Server {
+    #[inline]
     pub fn new() -> Self {
         Self::default()
     }
 
+    #[inline]
     pub fn host<T>(&mut self, host: T) -> &mut Self
     where
         T: Into<String>,
@@ -35,6 +37,7 @@ impl Server {
         self
     }
 
+    #[inline]
     pub fn port(&mut self, port: usize) -> &mut Self {
         let _ = self.get_cfg().write().and_then(|mut cfg| {
             cfg.set_port(port);
@@ -43,6 +46,7 @@ impl Server {
         self
     }
 
+    #[inline]
     pub fn thread_pool_size(&mut self, thread_pool_size: usize) -> &mut Self {
         let _ = self.get_cfg().write().and_then(|mut cfg| {
             cfg.set_thread_pool_size(thread_pool_size);
@@ -51,6 +55,7 @@ impl Server {
         self
     }
 
+    #[inline]
     pub fn log_dir<T>(&mut self, log_dir: T) -> &mut Self
     where
         T: Into<String> + Clone,
@@ -66,6 +71,7 @@ impl Server {
         self
     }
 
+    #[inline]
     pub fn log_size(&mut self, log_size: usize) -> &mut Self {
         let _ = self.get_cfg().write().and_then(|mut cfg| {
             cfg.set_log_size(log_size);
@@ -78,6 +84,7 @@ impl Server {
         self
     }
 
+    #[inline]
     pub fn buffer_size(&mut self, buffer_size: usize) -> &mut Self {
         let _ = self.get_cfg().write().and_then(|mut cfg| {
             cfg.set_buffer_size(buffer_size);
@@ -86,6 +93,7 @@ impl Server {
         self
     }
 
+    #[inline]
     pub fn func<F>(&mut self, func: F) -> &mut Self
     where
         F: 'static + Send + Sync + Fn(&mut ControllerData),
@@ -96,6 +104,7 @@ impl Server {
         self
     }
 
+    #[inline]
     pub fn middleware<F>(&mut self, func: F) -> &mut Self
     where
         F: 'static + Send + Sync + Fn(&mut ControllerData),
@@ -106,6 +115,7 @@ impl Server {
         self
     }
 
+    #[inline]
     fn handle_stream(&self, mut stream: &TcpStream) -> Vec<u8> {
         let buffer_size: usize = self
             .get_cfg()
@@ -138,10 +148,12 @@ impl Server {
         buffer
     }
 
+    #[inline]
     fn common_log(data: &String) -> String {
         format!("{}: {}{}", current_time(), data.to_string(), HTTP_BR)
     }
 
+    #[inline]
     pub fn listen(&mut self) -> &mut Self {
         self.init();
         let mut host: String = EMPTY_STR.to_owned();
@@ -227,6 +239,7 @@ impl Server {
         self
     }
 
+    #[inline]
     fn init_log(&self) {
         let _ = self.get_tmp().read().and_then(|tmp| {
             log_run(tmp.get_log());
@@ -234,6 +247,7 @@ impl Server {
         });
     }
 
+    #[inline]
     fn init(&self) {
         self.init_log();
     }

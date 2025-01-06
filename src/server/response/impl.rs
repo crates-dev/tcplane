@@ -3,12 +3,14 @@ use crate::*;
 use std::{io::Write, net::TcpStream};
 
 impl Default for Response {
+    #[inline]
     fn default() -> Self {
         Self { data: Vec::new() }
     }
 }
 
 impl Response {
+    #[inline]
     pub fn data<T>(&mut self, data: T) -> &mut Self
     where
         T: Into<Vec<u8>>,
@@ -17,6 +19,7 @@ impl Response {
         self
     }
 
+    #[inline]
     pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
         let send_res: ResponseResult = stream
             .write_all(&self.get_data())
