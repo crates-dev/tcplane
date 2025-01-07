@@ -1,2 +1,2 @@
-pub mod list;
-pub mod thread;
+pub(crate) mod list;
+pub(crate) mod thread;

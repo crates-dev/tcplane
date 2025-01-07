@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "1.26.0"
+version = "1.27.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -17,14 +17,14 @@ exclude = [
 
 [dependencies]
 color-output = "6.1.4"
-http-constant = "1.22.0"
-http-type = "2.22.0"
-hyperlane-log = "0.19.0"
-hyperlane-time = "0.0.1"
-lombok-macros = "1.6.0"
+http-constant = "1.23.0"
+http-type = "2.25.0"
+hyperlane-log = "0.20.0"
+hyperlane-time = "0.0.2"
+lombok-macros = "1.7.0"
 pcre2 = "0.2.9"
 std-macro-extensions = "0.18.0"
-tcp-request = "1.6.0"
+tcp-request = "1.8.0"
 
 [profile.dev]
 incremental = true
