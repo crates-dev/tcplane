@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "1.24.0"
+version = "1.25.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -22,6 +22,7 @@ http-type = "2.21.0"
 hyperlane-log = "0.18.0"
 hyperlane-time = "0.0.1"
 lombok-macros = "1.5.0"
+pcre2 = "0.2.9"
 std-macro-extensions = "0.17.6"
 tcp-request = "1.5.0"
 
