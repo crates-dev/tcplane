@@ -58,9 +58,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-log"
-version = "0.21.0"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "885d6d92f418ec42fa86be5587959e79468b74cb0cae761596001a31dc52445a"
+checksum = "bbdeae70b3a982f078d447b81c92f9074f68e5465c40d4e39766182100ad138a"
 dependencies = [
  "http-type",
  "hyperlane-time",
@@ -392,7 +392,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "1.30.0"
+version = "1.31.0"
 dependencies = [
  "color-output",
  "http-constant",

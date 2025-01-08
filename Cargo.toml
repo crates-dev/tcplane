@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "1.30.0"
+version = "1.31.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -19,7 +19,7 @@ exclude = [
 color-output = "6.1.4"
 http-constant = "1.23.0"
 http-type = "2.25.0"
-hyperlane-log = "0.21.0"
+hyperlane-log = "0.22.0"
 hyperlane-time = "0.0.2"
 lombok-macros = "1.7.0"
 std-macro-extensions = "0.18.0"
