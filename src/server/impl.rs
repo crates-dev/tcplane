@@ -6,7 +6,6 @@ use super::{
 use crate::utils::list::remove_trailing_zeros;
 use crate::*;
 use http_type::*;
-use recoverable_spawn::*;
 use std::io::Read;
 
 impl Default for Server {
@@ -191,8 +190,7 @@ impl Server {
             let middleware_arc: MiddlewareArcLock = Arc::clone(&self.middleware);
             let func: FuncArcLock = Arc::clone(&self.func);
             let tmp_arc: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
-            let tmp_arc_clone: ArcRwLock<Tmp> = tmp_arc.clone();
-            let request_arc: Arc<Vec<u8>> = Arc::new(self.handle_stream(&stream_arc));
+            let request: Vec<u8> = self.handle_stream(&stream_arc);
             let thread_pool_func = move || {
                 let _ = tmp_arc.write().and_then(|mut tmp| {
                     tmp.add_thread_num();
@@ -202,36 +200,40 @@ impl Server {
                     .read()
                     .and_then(|tmp| Ok(tmp.log.clone()))
                     .unwrap_or_default();
-                let log_arc: Arc<Log> = Arc::new(log);
-                let _ = recoverable_spawn_with_error_handle(
-                    move || {
-                        let mut controller_data: ControllerData = ControllerData::new();
-                        controller_data
-                            .set_stream(Some(stream_arc.clone()))
-                            .set_response(super::response::r#type::Response { data: vec![] })
-                            .set_request(request_arc.as_ref().clone())
-                            .set_log(log_arc.as_ref().clone());
-                        if let Ok(middleware_guard) = middleware_arc.read() {
-                            for middleware in middleware_guard.iter() {
-                                middleware(&mut controller_data);
-                            }
+                let thread_result: Result<(), Box<dyn Any + Send>> = catch_unwind(move || {
+                    let mut controller_data: ControllerData = ControllerData::new();
+                    controller_data
+                        .set_stream(Some(stream_arc.clone()))
+                        .set_response(super::response::r#type::Response { data: vec![] })
+                        .set_request(request)
+                        .set_log(log);
+                    if let Ok(middleware_guard) = middleware_arc.read() {
+                        for middleware in middleware_guard.iter() {
+                            middleware(&mut controller_data);
                         }
-                        if let Ok(func_guard) = func.read() {
-                            func_guard(&mut controller_data);
-                        }
-                    },
-                    move |err_string| {
-                        let _ = tmp_arc.read().and_then(|tem| {
-                            tem.get_log()
-                                .log_error(format!("{}", err_string), Self::common_log);
-                            Ok(())
-                        });
-                    },
-                );
-                let _ = tmp_arc_clone.write().and_then(|mut tmp| {
+                    }
+                    if let Ok(func_guard) = func.read() {
+                        func_guard(&mut controller_data);
+                    }
+                });
+                let _ = tmp_arc.write().and_then(|mut tmp| {
                     tmp.sub_thread_num();
                     Ok(())
                 });
+                if let Err(err) = thread_result {
+                    let _ = tmp_arc.read().and_then(|tem| {
+                        let err_str: String = if let Some(msg) = err.downcast_ref::<&str>() {
+                            msg.to_string()
+                        } else if let Some(msg) = err.downcast_ref::<String>() {
+                            msg.to_owned()
+                        } else {
+                            format!("{:?}", err)
+                        };
+                        tem.get_log()
+                            .log_error(format!("{}", err_str), Self::common_log);
+                        Ok(())
+                    });
+                }
             };
             thread_pool.execute(thread_pool_func);
         }
