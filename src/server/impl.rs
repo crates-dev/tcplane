@@ -212,13 +212,13 @@ impl Server {
                     func_guard(&mut controller_data);
                 }
             };
-            let _ = thread_pool.execute(thread_pool_func, move |err_str| {
+            let handle_error_func = move |err_str: &str| {
                 let err_string: String = err_str.to_owned();
-                let _ = error_handle_tmp_arc.read().and_then(|tem| {
+                if let Ok(tem) = error_handle_tmp_arc.read() {
                     tem.get_log().log_error(err_string, Self::common_log);
-                    Ok(())
-                });
-            });
+                }
+            };
+            let _ = thread_pool.execute(thread_pool_func, handle_error_func);
         }
         self
     }

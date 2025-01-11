@@ -56,7 +56,7 @@ fn common_log(log_data: &String) -> String {
 fn run_server() {
     let mut server: Server = Server::new();
     server.host("0.0.0.0");
-    server.port(80);
+    server.port(60000);
     server.thread_pool_size(10);
     server.log_dir("./logs");
     server.log_size(1_024_000);
