@@ -83,5 +83,26 @@ fn test_server_basic_usage() {
         run_server();
     }
 
-    main();
+    let run_test = || {
+        recoverable_spawn(main);
+        std::thread::sleep(std::time::Duration::from_secs(4));
+        recoverable_spawn(|| {
+            let mut _request_builder = RequestBuilder::new()
+                .host("127.0.0.1")
+                .port(60000)
+                .data("hello world")
+                .timeout(10000)
+                .buffer(4096)
+                .build();
+            _request_builder
+                .send()
+                .and_then(|response| {
+                    println!("{:?}", response.text());
+                    Ok(response.binary())
+                })
+                .unwrap_or_default();
+        });
+    };
+    run_test();
+    std::thread::sleep(std::time::Duration::from_secs(6));
 }
