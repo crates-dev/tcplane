@@ -9,6 +9,7 @@ pub use hyperlane_log::*;
 pub use hyperlane_time::*;
 pub use lombok_macros::*;
 pub use recoverable_spawn::*;
+pub use recoverable_thread_pool::*;
 pub use server::{
     controller_data::r#type::*, error::r#type::Error as ServerError, r#type::Server,
     request::r#type::*, response::r#type::*,

@@ -6,7 +6,5 @@ pub(crate) mod r#impl;
 pub(crate) mod middleware;
 pub(crate) mod request;
 pub(crate) mod response;
-pub(crate) mod thread_pool;
 pub(crate) mod tmp;
 pub(crate) mod r#type;
-pub(crate) mod worker;

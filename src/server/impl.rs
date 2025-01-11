@@ -1,11 +1,11 @@
 use super::{
-    config::r#type::ServerConfig, controller_data::r#type::ControllerData, error::r#type::Error,
-    func::r#type::FuncArcLock, middleware::r#type::MiddlewareArcLock, r#type::Server,
-    thread_pool::r#type::ThreadPool, tmp::r#type::Tmp,
+    config::r#type::*, controller_data::r#type::*, error::r#type::*, func::r#type::*,
+    middleware::r#type::*, r#type::*, tmp::r#type::*,
 };
-use crate::utils::list::remove_trailing_zeros;
+use crate::utils::list::*;
 use crate::*;
 use http_type::*;
+use recoverable_thread_pool::*;
 use std::io::Read;
 
 impl Default for Server {
@@ -189,53 +189,36 @@ impl Server {
             let stream_arc: Arc<TcpStream> = Arc::new(stream);
             let middleware_arc: MiddlewareArcLock = Arc::clone(&self.middleware);
             let func: FuncArcLock = Arc::clone(&self.func);
-            let tmp_arc: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
+            let thread_pool_func_tmp_arc: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
+            let error_handle_tmp_arc: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
             let request: Vec<u8> = self.handle_stream(&stream_arc);
             let thread_pool_func = move || {
-                let _ = tmp_arc.write().and_then(|mut tmp| {
-                    tmp.add_thread_num();
-                    Ok(())
-                });
-                let log: Log = tmp_arc
+                let log: Log = thread_pool_func_tmp_arc
                     .read()
                     .and_then(|tmp| Ok(tmp.log.clone()))
                     .unwrap_or_default();
-                let thread_result: Result<(), Box<dyn Any + Send>> = catch_unwind(move || {
-                    let mut controller_data: ControllerData = ControllerData::new();
-                    controller_data
-                        .set_stream(Some(stream_arc.clone()))
-                        .set_response(super::response::r#type::Response { data: vec![] })
-                        .set_request(request)
-                        .set_log(log);
-                    if let Ok(middleware_guard) = middleware_arc.read() {
-                        for middleware in middleware_guard.iter() {
-                            middleware(&mut controller_data);
-                        }
+                let mut controller_data: ControllerData = ControllerData::new();
+                controller_data
+                    .set_stream(Some(stream_arc.clone()))
+                    .set_response(super::response::r#type::Response { data: vec![] })
+                    .set_request(request)
+                    .set_log(log);
+                if let Ok(middleware_guard) = middleware_arc.read() {
+                    for middleware in middleware_guard.iter() {
+                        middleware(&mut controller_data);
                     }
-                    if let Ok(func_guard) = func.read() {
-                        func_guard(&mut controller_data);
-                    }
-                });
-                let _ = tmp_arc.write().and_then(|mut tmp| {
-                    tmp.sub_thread_num();
-                    Ok(())
-                });
-                if let Err(err) = thread_result {
-                    let _ = tmp_arc.read().and_then(|tem| {
-                        let err_str: String = if let Some(msg) = err.downcast_ref::<&str>() {
-                            msg.to_string()
-                        } else if let Some(msg) = err.downcast_ref::<String>() {
-                            msg.to_owned()
-                        } else {
-                            format!("{:?}", err)
-                        };
-                        tem.get_log()
-                            .log_error(format!("{}", err_str), Self::common_log);
-                        Ok(())
-                    });
+                }
+                if let Ok(func_guard) = func.read() {
+                    func_guard(&mut controller_data);
                 }
             };
-            thread_pool.execute(thread_pool_func);
+            let _ = thread_pool.execute(thread_pool_func, move |err_str| {
+                let err_string: String = err_str.to_owned();
+                let _ = error_handle_tmp_arc.read().and_then(|tem| {
+                    tem.get_log().log_error(err_string, Self::common_log);
+                    Ok(())
+                });
+            });
         }
         self
     }
