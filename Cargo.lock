@@ -378,9 +378,9 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
 name = "std-macro-extensions"
-version = "0.18.0"
+version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e71c3025435f2ee74bd1f5bb8febb0e60e03dd575bfe62f10f3e99535034a7d4"
+checksum = "eb81c946abc2091d8d58391d0a3adcbc9d60cddbf3acebbc54690c2ba75ea9b1"
 
 [[package]]
 name = "syn"
@@ -406,9 +406,9 @@ dependencies = [
 
 [[package]]
 name = "tcp-request"
-version = "1.10.1"
+version = "1.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e42f9131dfcb059993b95197568d1b749bf8102e5b91be7a92ce69e661d3a98"
+checksum = "f95f4b43043a88a8cf3b5c6276c866ed7bd506da595eb234640de52beba6bcc9"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -416,7 +416,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "1.38.2"
+version = "1.39.0"
 dependencies = [
  "color-output",
  "file-operation",

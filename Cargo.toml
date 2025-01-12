@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "1.38.2"
+version = "1.39.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -25,8 +25,8 @@ hyperlane-time = "0.0.3"
 lombok-macros = "1.7.0"
 recoverable-spawn = "2.0.0"
 recoverable-thread-pool = "1.0.1"
-std-macro-extensions = "0.18.0"
-tcp-request = "1.10.1"
+std-macro-extensions = "0.20.0"
+tcp-request = "1.10.2"
 
 [profile.dev]
 incremental = true
