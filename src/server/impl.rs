@@ -6,7 +6,7 @@ use crate::utils::list::*;
 use crate::*;
 use http_type::*;
 use recoverable_thread_pool::*;
-use server::func::r#trait::AsyncFunc;
+use server::func::r#trait::*;
 use std::io::Read;
 
 impl Default for Server {
@@ -124,29 +124,33 @@ impl Server {
     }
 
     #[inline]
-    pub async fn async_func<F>(&mut self, func: F) -> &mut Self
+    pub async fn async_func<F, Fut>(&mut self, func: F) -> &mut Self
     where
-        F: AsyncFunc,
+        F: AsyncFuncWithoutPin<Fut>,
+        Fut: Future<Output = ()> + Send + Sync + 'static,
     {
         {
             let mut mut_async_func: tokio::sync::RwLockWriteGuard<'_, Box<dyn AsyncFunc>> =
                 self.async_func.write().await;
-            *mut_async_func = Box::new(func);
+            *mut_async_func = Box::new(move |controller_data| Box::pin(func(controller_data)));
         }
         self
     }
 
     #[inline]
-    pub async fn async_middleware<F>(&mut self, func: F) -> &mut Self
+    pub async fn async_middleware<F, Fut>(&mut self, func: F) -> &mut Self
     where
-        F: AsyncFunc,
+        F: AsyncFuncWithoutPin<Fut>,
+        Fut: Future<Output = ()> + Send + Sync + 'static,
     {
         {
             let mut mut_async_middleware: tokio::sync::RwLockWriteGuard<
                 '_,
                 Vec<Box<dyn AsyncFunc>>,
             > = self.async_middleware.write().await;
-            mut_async_middleware.push(Box::new(func));
+            mut_async_middleware.push(Box::new(move |controller_data| {
+                Box::pin(func(controller_data))
+            }));
         }
         self
     }

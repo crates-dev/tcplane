@@ -11,3 +11,10 @@ impl<F> AsyncFunc for F where
         + 'static
 {
 }
+
+impl<F, Fut> AsyncFuncWithoutPin<Fut> for F
+where
+    F: Fn(&mut ControllerData) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = ()> + Send + Sync + 'static,
+{
+}

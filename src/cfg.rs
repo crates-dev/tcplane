@@ -65,10 +65,8 @@ async fn test_server_basic_usage() {
         });
 
         server
-            .async_middleware(|_controller_data| {
-                Box::pin(async move {
-                    println!("async middleware");
-                })
+            .async_middleware(|_controller_data| async move {
+                println!("async middleware");
             })
             .await;
 
