@@ -1,4 +1,6 @@
 use crate::*;
-use http_type::ArcRwLock;
+use http_type::*;
+use server::{func::r#type::*, r#type::*};
 
-pub type MiddlewareArcLock = ArcRwLock<Vec<Box<dyn Fn(&mut ControllerData) + Send + Sync>>>;
+pub type MiddlewareArcLock = ArcRwLock<Vec<FuncBox>>;
+pub type AsyncMiddlewareArcLock = AsyncArcRwLock<Vec<AsyncFuncBox>>;

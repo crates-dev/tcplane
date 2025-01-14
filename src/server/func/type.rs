@@ -1,6 +1,10 @@
+use super::r#trait::{AsyncFunc, Func};
 use crate::*;
-use http_type::ArcRwLock;
+use http_type::*;
+use server::r#type::*;
 
-pub type Func = dyn Fn(&mut ControllerData) + Send + Sync + 'static;
-pub type FuncBox = Box<Func>;
-pub type FuncArcLock = ArcRwLock<Box<dyn Fn(&mut ControllerData) + Send + Sync>>;
+pub type FuncBox = Box<dyn Func>;
+pub type FuncArcLock = ArcRwLock<FuncBox>;
+
+pub type AsyncFuncBox = Box<dyn AsyncFunc>;
+pub type AsyncFuncArcLock = AsyncArcRwLock<AsyncFuncBox>;

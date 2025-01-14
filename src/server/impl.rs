@@ -6,6 +6,7 @@ use crate::utils::list::*;
 use crate::*;
 use http_type::*;
 use recoverable_thread_pool::*;
+use server::func::r#trait::AsyncFunc;
 use std::io::Read;
 
 impl Default for Server {
@@ -13,8 +14,14 @@ impl Default for Server {
     fn default() -> Self {
         Self {
             cfg: Arc::new(RwLock::new(ServerConfig::default())),
-            func: Arc::new(RwLock::new(Box::new(|_| {}))),
+            func: Arc::new(RwLock::new(Box::new(
+                |_controller_data: &mut ControllerData| {},
+            ))),
             middleware: Arc::new(RwLock::new(vec![])),
+            async_middleware: Arc::new(tokio::sync::RwLock::new(vec![])),
+            async_func: Arc::new(tokio::sync::RwLock::new(Box::new(
+                |_controller_data: &mut ControllerData| Box::pin(async {}),
+            ))),
             tmp: Arc::new(RwLock::new(Tmp::default())),
         }
     }
@@ -117,6 +124,34 @@ impl Server {
     }
 
     #[inline]
+    pub async fn async_func<F>(&mut self, func: F) -> &mut Self
+    where
+        F: AsyncFunc,
+    {
+        {
+            let mut mut_async_func: tokio::sync::RwLockWriteGuard<'_, Box<dyn AsyncFunc>> =
+                self.async_func.write().await;
+            *mut_async_func = Box::new(func);
+        }
+        self
+    }
+
+    #[inline]
+    pub async fn async_middleware<F>(&mut self, func: F) -> &mut Self
+    where
+        F: AsyncFunc,
+    {
+        {
+            let mut mut_async_middleware: tokio::sync::RwLockWriteGuard<
+                '_,
+                Vec<Box<dyn AsyncFunc>>,
+            > = self.async_middleware.write().await;
+            mut_async_middleware.push(Box::new(func));
+        }
+        self
+    }
+
+    #[inline]
     fn handle_stream(&self, mut stream: &TcpStream) -> Vec<u8> {
         let buffer_size: usize = self
             .get_cfg()
@@ -187,13 +222,16 @@ impl Server {
             }
             let stream: TcpStream = stream_res.unwrap();
             let stream_arc: Arc<TcpStream> = Arc::new(stream);
-            let middleware_arc: MiddlewareArcLock = Arc::clone(&self.middleware);
-            let func: FuncArcLock = Arc::clone(&self.func);
-            let thread_pool_func_tmp_arc: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
-            let error_handle_tmp_arc: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
+            let middleware_arc_lock: MiddlewareArcLock = Arc::clone(&self.middleware);
+            let async_middleware_arc_lock: AsyncMiddlewareArcLock =
+                Arc::clone(&self.async_middleware);
+            let func_arc_lock: FuncArcLock = Arc::clone(&self.func);
+            let async_func_arc_lock: AsyncFuncArcLock = Arc::clone(&self.async_func);
+            let thread_pool_func_tmp_arc_lock: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
+            let error_handle_tmp_arc_lock: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
             let request: Vec<u8> = self.handle_stream(&stream_arc);
-            let thread_pool_func = move || {
-                let log: Log = thread_pool_func_tmp_arc
+            let thread_pool_func = move || async move {
+                let log: Log = thread_pool_func_tmp_arc_lock
                     .read()
                     .and_then(|tmp| Ok(tmp.log.clone()))
                     .unwrap_or_default();
@@ -203,22 +241,28 @@ impl Server {
                     .set_response(super::response::r#type::Response { data: vec![] })
                     .set_request(request)
                     .set_log(log);
-                if let Ok(middleware_guard) = middleware_arc.read() {
+                if let Ok(middleware_guard) = middleware_arc_lock.read() {
                     for middleware in middleware_guard.iter() {
                         middleware(&mut controller_data);
                     }
                 }
-                if let Ok(func_guard) = func.read() {
+                let async_middleware_guard = async_middleware_arc_lock.read().await;
+                for async_middleware in async_middleware_guard.iter() {
+                    async_middleware(&mut controller_data).await;
+                }
+                if let Ok(func_guard) = func_arc_lock.read() {
                     func_guard(&mut controller_data);
                 }
+                let async_func_guard = async_func_arc_lock.read().await;
+                async_func_guard(&mut controller_data).await;
             };
-            let handle_error_func = move |err_str: &str| {
-                let err_string: String = err_str.to_owned();
-                if let Ok(tem) = error_handle_tmp_arc.read() {
-                    tem.get_log().log_error(err_string, Self::common_log);
+            let handle_error_func = move |err_string: Arc<String>| async move {
+                if let Ok(tem) = error_handle_tmp_arc_lock.read() {
+                    tem.get_log()
+                        .log_error(err_string.to_string(), Self::common_log);
                 }
             };
-            let _ = thread_pool.execute(thread_pool_func, handle_error_func, || {});
+            let _ = thread_pool.async_execute(thread_pool_func, handle_error_func, || async {});
         }
         self
     }

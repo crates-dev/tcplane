@@ -1,4 +1,3 @@
-#[test]
 fn test_server_basic_usage() {
     use crate::*;
 
@@ -63,6 +62,10 @@ fn test_server_basic_usage() {
                 common_log,
             );
         });
+
+        server.async_middleware(|controller_data| Box::pin(async move {
+            
+        }));
 
         server.func(|controller_data| {
             let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
