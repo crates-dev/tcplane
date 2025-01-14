@@ -1,4 +1,5 @@
-fn test_server_basic_usage() {
+#[tokio::test]
+async fn test_server_basic_usage() {
     use crate::*;
 
     fn println(data: &str) {
@@ -30,7 +31,7 @@ fn test_server_basic_usage() {
         write_data.clone()
     }
 
-    fn run_server() {
+    async fn run_server() {
         let mut server: Server = Server::new();
         server.host("0.0.0.0");
         server.port(60000);
@@ -63,9 +64,13 @@ fn test_server_basic_usage() {
             );
         });
 
-        server.async_middleware(|controller_data| Box::pin(async move {
-            
-        }));
+        server
+            .async_middleware(|_controller_data| {
+                Box::pin(async move {
+                    println!("async middleware");
+                })
+            })
+            .await;
 
         server.func(|controller_data| {
             let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
@@ -82,13 +87,11 @@ fn test_server_basic_usage() {
         server.listen();
     }
 
-    fn main() {
-        run_server();
+    async fn main() {
+        run_server().await;
     }
 
     let run_test = || {
-        recoverable_spawn(main);
-        std::thread::sleep(std::time::Duration::from_secs(4));
         recoverable_spawn(|| {
             let mut _request_builder = RequestBuilder::new()
                 .host("127.0.0.1")
@@ -106,6 +109,8 @@ fn test_server_basic_usage() {
                 .unwrap_or_default();
         });
     };
-    run_test();
-    std::thread::sleep(std::time::Duration::from_secs(6));
+    async_recoverable_spawn(main);
+    std::thread::sleep(std::time::Duration::from_secs(2));
+    recoverable_spawn(run_test);
+    std::thread::sleep(std::time::Duration::from_secs(4));
 }
