@@ -1,8 +1,5 @@
-use crate::utils::list::*;
 use crate::*;
 use http_type::*;
-use recoverable_thread_pool::*;
-use server::func::r#trait::*;
 use std::io::Read;
 
 impl Default for Server {
@@ -11,12 +8,12 @@ impl Default for Server {
         Self {
             cfg: Arc::new(RwLock::new(ServerConfig::default())),
             func: Arc::new(RwLock::new(Box::new(
-                |_controller_data: &mut ControllerData| {},
+                |_controller_data: ArcRwLockControllerData| {},
             ))),
             middleware: Arc::new(RwLock::new(vec![])),
             async_middleware: Arc::new(tokio::sync::RwLock::new(vec![])),
             async_func: Arc::new(tokio::sync::RwLock::new(Box::new(
-                |_controller_data: &mut ControllerData| Box::pin(async {}),
+                |_controller_data: ArcRwLockControllerData| Box::pin(async {}),
             ))),
             tmp: Arc::new(RwLock::new(Tmp::default())),
         }
@@ -100,7 +97,7 @@ impl Server {
     #[inline]
     pub fn func<F>(&mut self, func: F) -> &mut Self
     where
-        F: 'static + Send + Sync + Fn(&mut ControllerData),
+        F: 'static + Send + Sync + Fn(ArcRwLockControllerData),
     {
         if let Ok(mut mut_func) = self.func.write() {
             *mut_func = Box::new(func);
@@ -111,7 +108,7 @@ impl Server {
     #[inline]
     pub fn middleware<F>(&mut self, func: F) -> &mut Self
     where
-        F: 'static + Send + Sync + Fn(&mut ControllerData),
+        F: 'static + Send + Sync + Fn(ArcRwLockControllerData),
     {
         if let Ok(mut middleware) = self.middleware.write() {
             middleware.push(Box::new(func));
@@ -128,7 +125,8 @@ impl Server {
         {
             let mut mut_async_func: tokio::sync::RwLockWriteGuard<'_, Box<dyn AsyncFunc>> =
                 self.async_func.write().await;
-            *mut_async_func = Box::new(move |controller_data| Box::pin(func(controller_data)));
+            *mut_async_func =
+                Box::new(move |arc_lock_controller_data| Box::pin(func(arc_lock_controller_data)));
         }
         self
     }
@@ -144,8 +142,8 @@ impl Server {
                 '_,
                 Vec<Box<dyn AsyncFunc>>,
             > = self.async_middleware.write().await;
-            mut_async_middleware.push(Box::new(move |controller_data| {
-                Box::pin(func(controller_data))
+            mut_async_middleware.push(Box::new(move |arc_lock_controller_data| {
+                Box::pin(func(arc_lock_controller_data))
             }));
         }
         self
@@ -235,26 +233,32 @@ impl Server {
                     .read()
                     .and_then(|tmp| Ok(tmp.log.clone()))
                     .unwrap_or_default();
-                let mut controller_data: ControllerData = ControllerData::new();
-                controller_data
+                let mut arc_lock_controller_data: ControllerData = ControllerData::new();
+                arc_lock_controller_data
                     .set_stream(Some(stream_arc.clone()))
                     .set_response(super::response::r#type::Response { data: vec![] })
                     .set_request(request)
                     .set_log(log);
+                let arc_lock_controller_data: ArcRwLockControllerData =
+                    Arc::new(RwLock::new(arc_lock_controller_data));
                 if let Ok(middleware_guard) = middleware_arc_lock.read() {
                     for middleware in middleware_guard.iter() {
-                        middleware(&mut controller_data);
+                        middleware(Arc::clone(&arc_lock_controller_data));
                     }
                 }
-                let async_middleware_guard = async_middleware_arc_lock.read().await;
+                let async_middleware_guard: tokio::sync::RwLockReadGuard<
+                    '_,
+                    Vec<Box<dyn AsyncFunc>>,
+                > = async_middleware_arc_lock.read().await;
                 for async_middleware in async_middleware_guard.iter() {
-                    async_middleware(&mut controller_data).await;
+                    async_middleware(Arc::clone(&arc_lock_controller_data)).await;
                 }
                 if let Ok(func_guard) = func_arc_lock.read() {
-                    func_guard(&mut controller_data);
+                    func_guard(Arc::clone(&arc_lock_controller_data));
                 }
-                let async_func_guard = async_func_arc_lock.read().await;
-                async_func_guard(&mut controller_data).await;
+                let async_func_guard: tokio::sync::RwLockReadGuard<'_, Box<dyn AsyncFunc>> =
+                    async_func_arc_lock.read().await;
+                async_func_guard(Arc::clone(&arc_lock_controller_data)).await;
             };
             let handle_error_func = move |err_string: Arc<String>| async move {
                 if let Ok(tem) = error_handle_tmp_arc_lock.read() {

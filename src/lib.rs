@@ -19,5 +19,10 @@ pub use tcp_request::*;
 pub use tokio;
 
 pub(crate) use server::{
-    config::r#type::*, func::r#type::*, middleware::r#type::*, r#type::*, tmp::r#type::*,
+    config::r#type::*,
+    func::{r#trait::*, r#type::*},
+    middleware::r#type::*,
+    r#type::*,
+    tmp::r#type::*,
 };
+pub(crate) use utils::list::*;

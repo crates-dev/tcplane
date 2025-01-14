@@ -39,7 +39,8 @@ async fn test_server_basic_usage() {
         server.log_dir("./logs");
         server.log_size(1_024_000);
         server.buffer(1_024_000);
-        server.middleware(|controller_data| {
+        server.middleware(|arc_lock_controller_data| {
+            let mut controller_data = arc_lock_controller_data.write().unwrap();
             {
                 let request: &mut Vec<u8> = controller_data.get_mut_request();
                 let mut new_request: Vec<u8> = request.clone();
@@ -65,12 +66,17 @@ async fn test_server_basic_usage() {
         });
 
         server
-            .async_middleware(|_controller_data| async move {
-                println!("async middleware");
+            .async_middleware(|arc_lock_controller_data| async move {
+                let controller_data = arc_lock_controller_data.write().unwrap();
+                println!(
+                    "async middleware request{:?}",
+                    String::from_utf8_lossy(controller_data.get_request())
+                );
             })
             .await;
 
-        server.func(|controller_data| {
+        server.func(|arc_lock_controller_data| {
+            let controller_data = arc_lock_controller_data.write().unwrap();
             let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
             let res: ResponseResult = controller_data
                 .get_response()
