@@ -1,5 +1,4 @@
-use crate::ControllerData;
-use std_macro_extensions::*;
+use crate::*;
 
 pub trait AsyncFunc:
     Fn(&mut ControllerData) -> Pin<Box<dyn Future<Output = ()> + Send + Sync + 'static>>

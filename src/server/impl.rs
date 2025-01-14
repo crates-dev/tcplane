@@ -1,7 +1,3 @@
-use super::{
-    config::r#type::*, controller_data::r#type::*, error::r#type::*, func::r#type::*,
-    middleware::r#type::*, r#type::*, tmp::r#type::*,
-};
 use crate::utils::list::*;
 use crate::*;
 use http_type::*;
@@ -206,12 +202,12 @@ impl Server {
             Ok(())
         });
         let addr: String = format!("{}{}{}", host, COLON_SPACE_SYMBOL, port);
-        let listener_res: Result<TcpListener, Error> =
-            TcpListener::bind(&addr).map_err(|e| Error::TcpBindError(e.to_string()));
+        let listener_res: Result<TcpListener, ServerError> =
+            TcpListener::bind(&addr).map_err(|e| ServerError::TcpBindError(e.to_string()));
         if listener_res.is_err() {
             let _ = self.get_tmp().write().and_then(|tmp| {
                 tmp.get_log().log_error(
-                    format!("{}", listener_res.err().unwrap_or(Error::Unknown)),
+                    format!("{}", listener_res.err().unwrap_or(ServerError::Unknown)),
                     Self::common_log,
                 );
                 Ok(())

@@ -596,7 +596,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "1.42.0"
+version = "1.44.1"
 dependencies = [
  "color-output",
  "file-operation",

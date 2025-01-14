@@ -17,3 +17,7 @@ pub use server::{
 pub use std_macro_extensions::*;
 pub use tcp_request::*;
 pub use tokio;
+
+pub(crate) use server::{
+    config::r#type::*, func::r#type::*, middleware::r#type::*, r#type::*, tmp::r#type::*,
+};
