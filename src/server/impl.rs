@@ -233,17 +233,17 @@ impl Server {
                     .read()
                     .and_then(|tmp| Ok(tmp.log.clone()))
                     .unwrap_or_default();
-                let mut arc_lock_controller_data: ControllerData = ControllerData::new();
-                arc_lock_controller_data
+                let mut controller_data: ControllerData = ControllerData::new();
+                controller_data
                     .set_stream(Some(stream_arc.clone()))
                     .set_response(super::response::r#type::Response { data: vec![] })
                     .set_request(request)
                     .set_log(log);
                 let arc_lock_controller_data: ArcRwLockControllerData =
-                    Arc::new(RwLock::new(arc_lock_controller_data));
+                    Arc::new(RwLock::new(controller_data));
                 if let Ok(middleware_guard) = middleware_arc_lock.read() {
                     for middleware in middleware_guard.iter() {
-                        middleware(Arc::clone(&arc_lock_controller_data));
+                        middleware(arc_lock_controller_data.clone());
                     }
                 }
                 let async_middleware_guard: tokio::sync::RwLockReadGuard<
@@ -251,14 +251,14 @@ impl Server {
                     Vec<Box<dyn AsyncFunc>>,
                 > = async_middleware_arc_lock.read().await;
                 for async_middleware in async_middleware_guard.iter() {
-                    async_middleware(Arc::clone(&arc_lock_controller_data)).await;
+                    async_middleware(arc_lock_controller_data.clone()).await;
                 }
                 if let Ok(func_guard) = func_arc_lock.read() {
-                    func_guard(Arc::clone(&arc_lock_controller_data));
+                    func_guard(arc_lock_controller_data.clone());
                 }
-                let async_func_guard: tokio::sync::RwLockReadGuard<'_, Box<dyn AsyncFunc>> =
+                let async_func: tokio::sync::RwLockReadGuard<'_, Box<dyn AsyncFunc>> =
                     async_func_arc_lock.read().await;
-                async_func_guard(Arc::clone(&arc_lock_controller_data)).await;
+                async_func(arc_lock_controller_data.clone()).await;
             };
             let handle_error_func = move |err_string: Arc<String>| async move {
                 if let Ok(tem) = error_handle_tmp_arc_lock.read() {

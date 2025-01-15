@@ -64,7 +64,7 @@ fn run_server() {
     server.log_size(1_024_000);
     server.buffer(1_024_000);
     server.middleware(|arc_lock_controller_data| {
-        let mut controller_data = arc_lock_controller_data.write().unwrap();
+        let mut controller_data: RwLockWriteControllerData = arc_lock_controller_data.write().unwrap();
         {
             let request: &mut Vec<u8> = controller_data.get_mut_request();
             let mut new_request: Vec<u8> = request.clone();
@@ -90,7 +90,7 @@ fn run_server() {
     });
 
     server.func(|arc_lock_controller_data| {
-        let controller_data = arc_lock_controller_data.write().unwrap();
+        let controller_data: RwLockWriteControllerData = arc_lock_controller_data.write().unwrap();
         let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
         let res: ResponseResult = controller_data
             .get_response()
@@ -147,7 +147,8 @@ async fn run_server() {
     server.log_size(1_024_000);
     server.buffer(1_024_000);
     server.middleware(|arc_lock_controller_data| {
-        let mut controller_data = arc_lock_controller_data.write().unwrap();
+        let mut controller_data: RwLockWriteControllerData =
+            arc_lock_controller_data.write().unwrap();
         {
             let request: &mut Vec<u8> = controller_data.get_mut_request();
             let mut new_request: Vec<u8> = request.clone();
@@ -174,7 +175,8 @@ async fn run_server() {
 
     server
         .async_middleware(|arc_lock_controller_data| async move {
-            let controller_data = arc_lock_controller_data.write().unwrap();
+            let controller_data: RwLockWriteControllerData =
+                arc_lock_controller_data.write().unwrap();
             println!(
                 "async middleware request{:?}",
                 String::from_utf8_lossy(controller_data.get_request())
@@ -183,7 +185,8 @@ async fn run_server() {
         .await;
 
     server.func(|arc_lock_controller_data| {
-        let controller_data = arc_lock_controller_data.write().unwrap();
+        let controller_data: RwLockWriteControllerData =
+            arc_lock_controller_data.write().unwrap();
         let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
         let res: ResponseResult = controller_data
             .get_response()

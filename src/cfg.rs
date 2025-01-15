@@ -40,7 +40,8 @@ async fn test_server_basic_usage() {
         server.log_size(1_024_000);
         server.buffer(1_024_000);
         server.middleware(|arc_lock_controller_data| {
-            let mut controller_data = arc_lock_controller_data.write().unwrap();
+            let mut controller_data: RwLockWriteControllerData =
+                arc_lock_controller_data.write().unwrap();
             {
                 let request: &mut Vec<u8> = controller_data.get_mut_request();
                 let mut new_request: Vec<u8> = request.clone();
@@ -67,7 +68,8 @@ async fn test_server_basic_usage() {
 
         server
             .async_middleware(|arc_lock_controller_data| async move {
-                let controller_data = arc_lock_controller_data.write().unwrap();
+                let controller_data: RwLockWriteControllerData =
+                    arc_lock_controller_data.write().unwrap();
                 println!(
                     "async middleware request{:?}",
                     String::from_utf8_lossy(controller_data.get_request())
@@ -76,7 +78,8 @@ async fn test_server_basic_usage() {
             .await;
 
         server.func(|arc_lock_controller_data| {
-            let controller_data = arc_lock_controller_data.write().unwrap();
+            let controller_data: RwLockWriteControllerData =
+                arc_lock_controller_data.write().unwrap();
             let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
             let res: ResponseResult = controller_data
                 .get_response()
@@ -91,29 +94,23 @@ async fn test_server_basic_usage() {
         server.listen();
     }
 
-    async fn main() {
-        run_server().await;
-    }
-
     let run_test = || {
-        recoverable_spawn(|| {
-            let mut _request_builder = RequestBuilder::new()
-                .host("127.0.0.1")
-                .port(60000)
-                .data("hello world")
-                .timeout(10000)
-                .buffer(4096)
-                .build();
-            _request_builder
-                .send()
-                .and_then(|response| {
-                    println!("{:?}", response.text());
-                    Ok(response.binary())
-                })
-                .unwrap_or_default();
-        });
+        let mut _request_builder = RequestBuilder::new()
+            .host("127.0.0.1")
+            .port(60000)
+            .data("hello world")
+            .timeout(10000)
+            .buffer(4096)
+            .build();
+        _request_builder
+            .send()
+            .and_then(|response| {
+                println!("{:?}", response.text());
+                Ok(response.binary())
+            })
+            .unwrap_or_default();
     };
-    async_recoverable_spawn(main);
+    async_recoverable_spawn(run_server);
     std::thread::sleep(std::time::Duration::from_secs(2));
     recoverable_spawn(run_test);
     std::thread::sleep(std::time::Duration::from_secs(4));
