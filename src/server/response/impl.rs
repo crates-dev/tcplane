@@ -11,15 +11,6 @@ impl Default for Response {
 
 impl Response {
     #[inline]
-    pub fn data<T>(&mut self, data: T) -> &mut Self
-    where
-        T: Into<Vec<u8>>,
-    {
-        self.set_data(data.into());
-        self
-    }
-
-    #[inline]
     pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
         let send_res: ResponseResult = stream
             .write_all(&self.get_data())
