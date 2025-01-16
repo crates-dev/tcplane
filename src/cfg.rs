@@ -48,7 +48,7 @@ async fn test_server_basic_usage() {
             .and_then(|host| Ok(host.to_string()))
             .unwrap_or("Unknown".to_owned());
 
-        controller_data.get_log().log_debug(
+        controller_data.get_log().debug(
             format!(
                 "Request host => {}\n{:#?}\n",
                 host,
@@ -74,7 +74,7 @@ async fn test_server_basic_usage() {
             .clone()
             .set_data("hello world".into())
             .send(&stream);
-        controller_data.get_log().log_debug(
+        controller_data.get_log().debug(
             format!("Response => {:?}\n", String::from_utf8_lossy(&res.unwrap())),
             common_log,
         );
@@ -88,7 +88,7 @@ async fn test_server_basic_usage() {
             .clone()
             .set_data("Async".into())
             .send(&stream);
-        controller_data.get_log().log_debug(
+        controller_data.get_log().debug(
             format!("Response => {:?}\n", String::from_utf8_lossy(&res.unwrap())),
             common_log,
         );

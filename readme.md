@@ -70,7 +70,7 @@ fn sync_middleware(arc_lock_controller_data: ArcRwLockControllerData) {
         .and_then(|host| Ok(host.to_string()))
         .unwrap_or("Unknown".to_owned());
 
-    controller_data.get_log().log_debug(
+    controller_data.get_log().debug(
         format!(
             "Request host => {}\n{:#?}\n",
             host,
@@ -96,7 +96,7 @@ fn sync_func(arc_lock_controller_data: ArcRwLockControllerData) {
         .clone()
         .set_data("hello world".into())
         .send(&stream);
-    controller_data.get_log().log_debug(
+    controller_data.get_log().debug(
         format!("Response => {:?}\n", String::from_utf8_lossy(&res.unwrap())),
         common_log,
     );
@@ -110,7 +110,7 @@ async fn async_func(arc_lock_controller_data: ArcRwLockControllerData) {
         .clone()
         .set_data("Async".into())
         .send(&stream);
-    controller_data.get_log().log_debug(
+    controller_data.get_log().debug(
         format!("Response => {:?}\n", String::from_utf8_lossy(&res.unwrap())),
         common_log,
     );
