@@ -57,6 +57,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "clonelicious"
+version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b284715abcdc38629cb63e7480fa8c9feb1fa3d9a93f1e1a5dd64cae33b82855"
+
+[[package]]
 name = "color-output"
 version = "6.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -597,8 +603,9 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "2.0.5"
+version = "2.1.0"
 dependencies = [
+ "clonelicious",
  "color-output",
  "file-operation",
  "http-constant",
