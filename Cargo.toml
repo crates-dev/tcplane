@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "2.2.0"
+version = "2.2.1"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -17,7 +17,7 @@ exclude = [
 
 [dependencies]
 async-func = "0.0.1"
-clonelicious = "0.0.2"
+clonelicious = "1.0.0"
 color-output = "6.1.4"
 file-operation = "0.3.0"
 http-constant = "1.25.1"
