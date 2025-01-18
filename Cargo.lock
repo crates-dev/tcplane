@@ -18,6 +18,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "512761e0bb2578dd7380c6baaa0f4ce03e84f95e960231d1dec8bf4d7d6e2627"
 
 [[package]]
+name = "async-func"
+version = "0.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ae19765a91046d3ecda91abef80c535f2afa16c8d7760488e8022e324ab0b3d"
+dependencies = [
+ "tokio",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -603,8 +612,9 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "2.1.0"
+version = "2.2.0"
 dependencies = [
+ "async-func",
  "clonelicious",
  "color-output",
  "file-operation",

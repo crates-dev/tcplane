@@ -128,6 +128,13 @@ async fn run_server() {
     server.async_middleware(async_middleware).await;
     server.func(sync_func);
     server.async_func(async_func).await;
+    let test_string: String = "test".to_owned();
+    server
+        .async_func(async_func!(test_string, |data| {
+            println(&test_string);
+            println(&format!("{:?}", data));
+        }))
+        .await;
     server.listen();
 }
 ```
