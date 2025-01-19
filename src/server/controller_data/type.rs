@@ -1,5 +1,9 @@
 use crate::*;
 use http_type::*;
+use std::{
+    net::TcpStream,
+    sync::{RwLockReadGuard, RwLockWriteGuard},
+};
 
 pub type ArcTcpStream = Arc<TcpStream>;
 pub type OptionArcTcpStream = Option<ArcTcpStream>;
