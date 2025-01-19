@@ -126,9 +126,9 @@ checksum = "b7e2991db9cba1223b35dcf186f4a5bf9ff5fdb44abfe346d424fe9107cd4c90"
 
 [[package]]
 name = "http-type"
-version = "2.29.0"
+version = "2.30.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f62d46f0d2f1e5f6ee6edd869f5fc934557e9b1a42957a574cc98a90c8d12d20"
+checksum = "426e0b4ad34b592d99f61af6053727f63001b7982e77396336945df4cff0e650"
 dependencies = [
  "hex",
  "http-constant",
@@ -143,9 +143,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-log"
-version = "1.1.2"
+version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb14154a08b2d1adf32a32f6af10187936c7b3f7409c90cffb0001a65687e1a4"
+checksum = "e0e038c432934b7c4f2ff167c0e1fd47d37b27828f90b4b7dc70386407859550"
 dependencies = [
  "file-operation",
  "http-type",
@@ -520,9 +520,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.135"
+version = "1.0.136"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b0d7ba2887406110130a978386c4e1befb98c674b4fba677954e4db976630d9"
+checksum = "336a0c23cf42a38d9eaa7cd22c7040d04e1228a19a933890805ffd00a16437d2"
 dependencies = [
  "itoa",
  "memchr",
@@ -603,9 +603,9 @@ dependencies = [
 
 [[package]]
 name = "tcp-request"
-version = "1.10.3"
+version = "1.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b48edcf4f1a74fc6db540f767fd99a52b83633aca011270d4eed187c6b9db0f5"
+checksum = "9b3ccda238d5b6186fab0fdfe6573b7db189590a5b541d489916e67a883a459b"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -613,7 +613,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "2.2.2"
+version = "2.2.3"
 dependencies = [
  "async-func",
  "clonelicious",
