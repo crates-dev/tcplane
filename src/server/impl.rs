@@ -233,6 +233,13 @@ impl Server {
         let thread_pool: ThreadPool = ThreadPool::new(thread_pool_size);
         for stream_res in tcp_listener.incoming() {
             if stream_res.is_err() {
+                let tmp_arc_lock: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
+                let _ = run_function(move || {
+                    if let Ok(tem) = tmp_arc_lock.read() {
+                        tem.get_log()
+                            .error(stream_res.err().unwrap().to_string(), Self::common_log);
+                    }
+                });
                 continue;
             }
             let stream: TcpStream = stream_res.unwrap();

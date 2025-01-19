@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "2.3.0"
+version = "2.3.2"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -16,28 +16,37 @@ exclude = [
 ]
 
 [dependencies]
-async-func = "0.1.0"
-clonelicious = "1.0.0"
+async-func = "0.1.2"
+clonelicious = "1.0.1"
 color-output = "6.1.4"
-file-operation = "0.3.0"
-http-constant = "1.25.1"
-http-type = "2.30.0"
-hyperlane-log = "1.1.3"
-hyperlane-time = "0.0.3"
+file-operation = "0.3.1"
+http-constant = "1.25.2"
+http-type = "2.30.3"
+hyperlane-log = "1.1.4"
+hyperlane-time = "0.0.4"
 lombok-macros = "1.7.0"
 recoverable-spawn = "3.3.1"
 recoverable-thread-pool = "2.0.1"
 std-macro-extensions = "0.20.1"
-tcp-request = "1.10.4"
+tcp-request = "1.10.5"
 tokio = { version = "1.43.0", features = ["full"] }
 
 [profile.dev]
-incremental = true
+incremental = false
 opt-level = 3
 lto = true
 panic = "abort"
+debug = false
+codegen-units = 1
+strip = "debuginfo"
+backtrace = "off"
 
 [profile.release]
+incremental = false
 opt-level = 3
 lto = true
 panic = "abort"
+debug = false
+codegen-units = 1
+strip = "debuginfo"
+backtrace = "off"
