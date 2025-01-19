@@ -222,7 +222,10 @@ impl Server {
         if listener_res.is_err() {
             let _ = self.get_tmp().write().and_then(|tmp| {
                 tmp.get_log().error(
-                    format!("{}", listener_res.err().unwrap_or(ServerError::Unknown)),
+                    listener_res
+                        .err()
+                        .unwrap_or(ServerError::Unknown)
+                        .to_string(),
                     Self::common_log,
                 );
                 Ok(())
