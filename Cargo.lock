@@ -19,9 +19,9 @@ checksum = "512761e0bb2578dd7380c6baaa0f4ce03e84f95e960231d1dec8bf4d7d6e2627"
 
 [[package]]
 name = "async-func"
-version = "0.0.1"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ae19765a91046d3ecda91abef80c535f2afa16c8d7760488e8022e324ab0b3d"
+checksum = "fc7d2b380ea870952a50b605dd254fe0cebe062f1634c8b810e7cc4fe75dd81f"
 dependencies = [
  "tokio",
 ]
@@ -613,7 +613,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "2.2.3"
+version = "2.3.0"
 dependencies = [
  "async-func",
  "clonelicious",

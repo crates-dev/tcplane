@@ -252,8 +252,7 @@ impl Server {
                     .unwrap_or_default();
                 let mut controller_data: ControllerData = ControllerData::new();
                 controller_data
-                    .set_stream(Some(stream_arc.clone()))
-                    .set_response(super::response::r#type::Response { data: vec![] })
+                    .set_stream(Some(stream_arc))
                     .set_request(request)
                     .set_log(log);
                 let arc_lock_controller_data: ArcRwLockControllerData =
@@ -263,19 +262,13 @@ impl Server {
                         middleware(arc_lock_controller_data.clone());
                     }
                 }
-                let async_middleware_guard: tokio::sync::RwLockReadGuard<
-                    '_,
-                    Vec<Box<dyn AsyncFunc>>,
-                > = async_middleware_arc_lock.read().await;
-                for async_middleware in async_middleware_guard.iter() {
+                for async_middleware in async_middleware_arc_lock.read().await.iter() {
                     async_middleware(arc_lock_controller_data.clone()).await;
                 }
                 if let Ok(func_guard) = func_arc_lock.read() {
                     func_guard(arc_lock_controller_data.clone());
                 }
-                let async_func: tokio::sync::RwLockReadGuard<'_, Box<dyn AsyncFunc>> =
-                    async_func_arc_lock.read().await;
-                async_func(arc_lock_controller_data.clone()).await;
+                async_func_arc_lock.read().await(arc_lock_controller_data.clone()).await;
             };
             let handle_error_func = move |err_string: Arc<String>| async move {
                 if let Ok(tem) = error_handle_tmp_arc_lock.read() {
