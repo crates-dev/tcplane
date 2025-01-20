@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "2.3.11"
+version = "2.3.12"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -26,7 +26,7 @@ hyperlane-log = "1.1.11"
 hyperlane-time = "0.0.5"
 lombok-macros = "1.7.0"
 recoverable-spawn = "3.3.4"
-recoverable-thread-pool = "2.0.5"
+recoverable-thread-pool = "2.0.6"
 std-macro-extensions = "0.20.5"
 tcp-request = "1.10.14"
 tokio = { version = "1.43.0", features = ["full"] }
