@@ -642,9 +642,9 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
 name = "std-macro-extensions"
-version = "0.20.5"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62b1d584e03ca7e024b8abd29c1cfabb33722305cd504535a631edad79cf1f78"
+checksum = "154a164a9901fa9fc9db90f614215320d0e3ea8a7cab79be94d3004878adcecb"
 
 [[package]]
 name = "syn"
@@ -670,9 +670,9 @@ dependencies = [
 
 [[package]]
 name = "tcp-request"
-version = "1.10.16"
+version = "1.10.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fed86f90ac0c77906b99ade9c2d3898cdf2ca743036339dda8c460ba500badd"
+checksum = "03d690d3f04523c3bc82dcaf1effc2e826cb1ed43c4dc67d6c5e42f71c732f09"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -680,7 +680,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "2.3.15"
+version = "2.4.0"
 dependencies = [
  "async-func",
  "clonelicious",
