@@ -2,7 +2,7 @@ pub(crate) mod cfg;
 pub(crate) mod server;
 pub(crate) mod utils;
 
-pub use crate::utils::thread::*;
+pub use crate::utils::{controller_data::*, log::*, thread::*};
 pub use async_func::*;
 pub use clonelicious::*;
 pub use color_output::*;
