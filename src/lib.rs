@@ -16,8 +16,8 @@ pub use recoverable_thread_pool::*;
 pub use serde;
 pub use serde_json;
 pub use server::{
-    controller_data::r#type::*, error::r#type::Error as ServerError, r#type::Server,
-    request::r#type::*, response::r#type::*,
+    config::r#type::*, controller_data::r#type::*, error::r#type::Error as ServerError,
+    r#type::Server, request::r#type::*, response::r#type::*,
 };
 pub use simd_json;
 pub use std_macro_extensions::*;
@@ -25,7 +25,6 @@ pub use tcp_request::*;
 pub use tokio;
 
 pub(crate) use server::{
-    config::r#type::*,
     func::{r#trait::*, r#type::*},
     middleware::r#type::*,
     r#type::*,
