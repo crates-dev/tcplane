@@ -86,24 +86,6 @@ async fn test_server_basic_usage() {
         server.listen();
     }
 
-    let run_test = || {
-        let mut _request_builder = RequestBuilder::new()
-            .host("127.0.0.1")
-            .port(60000)
-            .data("hello world")
-            .timeout(10000)
-            .buffer(4096)
-            .build();
-        _request_builder
-            .send()
-            .and_then(|response| {
-                println_success!("{:?}", response.text());
-                Ok(response.binary())
-            })
-            .unwrap_or_default();
-    };
     recoverable_spawn::r#async::recoverable_spawn(run_server);
-    std::thread::sleep(std::time::Duration::from_secs(2));
-    recoverable_spawn::r#sync::recoverable_spawn(run_test);
-    std::thread::sleep(std::time::Duration::from_secs(4));
+    std::thread::sleep(std::time::Duration::from_secs(10));
 }

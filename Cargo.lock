@@ -795,18 +795,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "tcp-request"
-version = "1.10.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51a1519c98db830b98707eff8643330a40c337dc1c96c297352611234faa2ade"
-dependencies = [
- "http-type",
- "lombok-macros",
-]
-
-[[package]]
 name = "tcplane"
-version = "2.9.2"
+version = "2.9.3"
 dependencies = [
  "async-func",
  "clonelicious",
@@ -824,7 +814,6 @@ dependencies = [
  "serde_json",
  "simd-json",
  "std-macro-extensions",
- "tcp-request",
  "tokio",
 ]
 
