@@ -42,7 +42,7 @@ async fn test_server_basic_usage() {
         let res: ResponseResult = controller_data
             .get_response()
             .clone()
-            .set_data("hello world".into())
+            .set_data("hello world")
             .send(&stream);
         controller_data.get_log().debug(
             format!("Response => {:?}\n", String::from_utf8_lossy(&res.unwrap())),
@@ -56,7 +56,7 @@ async fn test_server_basic_usage() {
         let res: ResponseResult = controller_data
             .get_response()
             .clone()
-            .set_data("Async".into())
+            .set_data("Async")
             .send(&stream);
         controller_data.get_log().debug(
             format!("Response => {:?}\n", String::from_utf8_lossy(&res.unwrap())),

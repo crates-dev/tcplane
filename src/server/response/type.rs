@@ -6,5 +6,6 @@ pub type ResponseResult = Result<ResponseData, Error>;
 
 #[derive(Clone, Debug, Lombok)]
 pub struct Response {
+    #[set(skip)]
     pub(crate) data: ResponseData,
 }

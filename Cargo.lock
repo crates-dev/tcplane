@@ -796,7 +796,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "2.9.5"
+version = "2.9.7"
 dependencies = [
  "async-func",
  "clonelicious",

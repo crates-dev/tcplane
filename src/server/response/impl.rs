@@ -20,4 +20,10 @@ impl Response {
             .cloned();
         send_res
     }
+
+    #[inline]
+    pub fn set_data<T: Into<ResponseData>>(&mut self, data: T) -> &mut Self {
+        self.data = data.into();
+        self
+    }
 }
