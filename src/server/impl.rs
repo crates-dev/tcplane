@@ -1,10 +1,5 @@
 use crate::*;
 use http_type::*;
-use std::{
-    future::Future,
-    io::Read,
-    net::{TcpListener, TcpStream},
-};
 
 impl Default for Server {
     #[inline]
@@ -88,6 +83,36 @@ impl Server {
         });
         let _ = self.get_tmp().write().and_then(|mut tmp| {
             tmp.log.set_interval_millis(interval_millis);
+            Ok(())
+        });
+        self
+    }
+
+    #[inline]
+    pub fn print(&mut self, print: bool) -> &mut Self {
+        let _ = self.get_cfg().write().and_then(|mut cfg| {
+            cfg.set_print(print);
+            Ok(())
+        });
+        self
+    }
+
+    #[inline]
+    pub fn enable_print(&mut self) -> &mut Self {
+        self.print(true);
+        self
+    }
+
+    #[inline]
+    pub fn disable_print(&mut self) -> &mut Self {
+        self.print(false);
+        self
+    }
+
+    #[inline]
+    pub fn open_print(&mut self, print: bool) -> &mut Self {
+        let _ = self.get_cfg().write().and_then(|mut cfg| {
+            cfg.set_print(print);
             Ok(())
         });
         self
@@ -283,6 +308,20 @@ impl Server {
     }
 
     #[inline]
+    fn init_panic_hook(&self) {
+        let print: bool = self
+            .get_cfg()
+            .read()
+            .and_then(|cfg| Ok(cfg.get_print().clone()))
+            .unwrap_or(DEFAULT_PRINT);
+        set_hook(Box::new(move |err| {
+            if print {
+                println_error!(format!("{}", err));
+            }
+        }));
+    }
+
+    #[inline]
     fn init_log(&self) {
         let _ = self.get_tmp().read().and_then(|tmp| {
             log_run(tmp.get_log());
@@ -292,6 +331,7 @@ impl Server {
 
     #[inline]
     fn init(&self) {
+        self.init_panic_hook();
         self.init_log();
     }
 }

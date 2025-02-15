@@ -1,7 +1,4 @@
-use super::r#trait::*;
 use crate::*;
-use std::{future::Future, pin::Pin};
-use std_macro_extensions::*;
 
 impl<F> Func for F where F: Fn(ArcRwLockControllerData) + Send + Sync + 'static {}
 

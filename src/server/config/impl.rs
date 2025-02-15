@@ -1,4 +1,3 @@
-use super::r#type::ServerConfig;
 use crate::*;
 use http_type::*;
 
@@ -12,6 +11,7 @@ impl Default for ServerConfig {
             log_size: DEFAULT_LOG_FILE_SIZE,
             buffer_size: DEFAULT_BUFFER_SIZE,
             interval_millis: DEFAULT_LOG_INTERVAL_MILLIS,
+            print: DEFAULT_PRINT,
         }
     }
 }

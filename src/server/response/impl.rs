@@ -1,6 +1,6 @@
 use super::error::Error;
 use crate::*;
-use std::{io::Write, net::TcpStream};
+use std::io::Write;
 
 impl Default for Response {
     #[inline]
