@@ -2,7 +2,6 @@ pub(crate) mod cfg;
 pub(crate) mod server;
 pub(crate) mod utils;
 
-pub use crate::utils::{controller_data::*, log::*, thread::*};
 pub use async_func::*;
 pub use clonelicious::*;
 pub use color_output::*;
@@ -22,6 +21,7 @@ pub use server::{
 pub use simd_json;
 pub use std_macro_extensions::*;
 pub use tokio;
+pub use utils::{controller_data::*, log::*, thread::*};
 
 pub(crate) use server::{
     config::constant::*,
@@ -40,4 +40,4 @@ pub(crate) use std::{
     pin::Pin,
     sync::{RwLockReadGuard, RwLockWriteGuard},
 };
-pub(crate) use utils::list::*;
+pub(crate) use utils::{error::*, list::*};
