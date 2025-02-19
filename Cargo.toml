@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "2.13.0"
+version = "2.13.1"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -21,7 +21,7 @@ clonelicious = "1.0.3"
 color-output = "6.4.0"
 file-operation = "0.4.1"
 http-constant = "1.28.0"
-http-type = "3.0.2"
+http-type = "3.0.3"
 hyperlane-log = "1.1.28"
 lombok-macros = "1.7.3"
 recoverable-spawn = "3.4.1"
