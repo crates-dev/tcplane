@@ -1,5 +1,4 @@
 use crate::*;
-use http_type::*;
 
 pub type ArcTcpStream = Arc<TcpStream>;
 pub type OptionArcTcpStream = Option<ArcTcpStream>;

@@ -1,5 +1,4 @@
 use crate::*;
-use http_type::*;
 
 impl Default for Server {
     #[inline]

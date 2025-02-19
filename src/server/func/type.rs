@@ -1,5 +1,4 @@
 use crate::*;
-use http_type::*;
 
 pub type FuncBox = Box<dyn Func>;
 pub type FuncArcLock = ArcRwLock<FuncBox>;

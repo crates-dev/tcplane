@@ -1,5 +1,4 @@
 use crate::*;
-use http_type::*;
 
 pub type AsyncArcRwLock<T> = Arc<tokio::sync::RwLock<T>>;
 

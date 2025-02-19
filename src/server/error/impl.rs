@@ -1,6 +1,5 @@
 use super::r#type::Error;
 use crate::*;
-use http_type::*;
 
 impl StdError for Error {}
 

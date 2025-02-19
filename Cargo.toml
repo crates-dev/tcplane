@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "2.12.2"
+version = "2.13.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -18,12 +18,11 @@ exclude = [
 [dependencies]
 async-func = "0.1.5"
 clonelicious = "1.0.3"
-color-output = "6.1.8"
+color-output = "6.4.0"
 file-operation = "0.4.1"
 http-constant = "1.28.0"
-http-type = "2.36.2"
-hyperlane-log = "1.1.26"
-hyperlane-time = "0.0.6"
+http-type = "3.0.2"
+hyperlane-log = "1.1.28"
 lombok-macros = "1.7.3"
 recoverable-spawn = "3.4.1"
 recoverable-thread-pool = "2.0.8"

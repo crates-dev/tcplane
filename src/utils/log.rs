@@ -1,5 +1,4 @@
 use crate::*;
-use http_type::*;
 
 #[inline]
 pub fn common_log<T: ToString>(data: &T) -> String {

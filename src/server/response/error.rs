@@ -1,8 +1,4 @@
-use http_constant::*;
-use std::{
-    error::Error as StdError,
-    fmt::{self, Display},
-};
+use crate::*;
 
 #[derive(Debug)]
 pub enum Error {
