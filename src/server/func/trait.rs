@@ -12,7 +12,7 @@ pub trait AsyncFunc:
 pub trait AsyncFuncWithoutPin<Fut>:
     Fn(ArcRwLockControllerData) -> Fut + Send + Sync + 'static
 where
-    Fut: Future<Output = ()> + Send + 'static,
+    Fut: Future<Output = ()> + Send + Sync + 'static,
 {
 }
 
