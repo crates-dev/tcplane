@@ -1,13 +1,11 @@
 use crate::*;
 
-pub type AsyncArcRwLock<T> = Arc<tokio::sync::RwLock<T>>;
+pub type AsyncArcRwLock<T> = Arc<RwLock<T>>;
 
 #[derive(Clone, Lombok)]
 pub struct Server {
-    pub(crate) cfg: ArcRwLock<ServerConfig>,
-    pub(crate) func: ArcRwLock<FuncBox>,
-    pub(crate) middleware: ArcRwLock<Vec<FuncBox>>,
-    pub(crate) async_func: AsyncArcRwLock<AsyncFuncBox>,
-    pub(crate) async_middleware: AsyncArcRwLock<Vec<AsyncFuncBox>>,
-    pub(crate) tmp: ArcRwLock<Tmp>,
+    pub(super) cfg: ArcRwLock<ServerConfig>,
+    pub(super) func: FuncArcLock,
+    pub(super) middleware: MiddlewareArcLock,
+    pub(super) tmp: ArcRwLock<Tmp>,
 }

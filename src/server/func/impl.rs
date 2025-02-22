@@ -2,14 +2,6 @@ use crate::*;
 
 impl<F> Func for F where F: Fn(ArcRwLockControllerData) + Send + Sync + 'static {}
 
-impl<F> AsyncFunc for F where
-    F: Fn(ArcRwLockControllerData) -> Pin<Box<dyn Future<Output = ()> + Send + Sync + 'static>>
-        + Send
-        + Sync
-        + 'static
-{
-}
-
 impl<F, Fut> AsyncFuncWithoutPin<Fut> for F
 where
     F: Fn(ArcRwLockControllerData) -> Fut + Send + Sync + 'static,

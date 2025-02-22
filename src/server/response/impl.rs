@@ -1,6 +1,5 @@
 use super::error::Error;
 use crate::*;
-use std::io::Write;
 
 impl Default for Response {
     #[inline]
@@ -11,13 +10,15 @@ impl Default for Response {
 
 impl Response {
     #[inline]
-    pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
-        let send_res: ResponseResult = stream
+    pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
+        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
+        let send_res: Result<Vec<u8>, Error> = stream
             .write_all(&self.get_data())
-            .and_then(|_| stream.flush())
+            .await
             .map_err(|err| Error::ResponseError(err.to_string()))
             .and_then(|_| Ok(self.get_data()))
             .cloned();
+        let _ = stream.flush().await;
         send_res
     }
 
