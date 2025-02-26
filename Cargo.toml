@@ -1,6 +1,6 @@
 [package]
 name = "tcplane"
-version = "3.0.2"
+version = "3.0.3"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -12,7 +12,9 @@ exclude = [
     "target",
     "Cargo.lock",
     "sh",
-    ".github"
+    ".github",
+    "logs",
+    "**/*.log"
 ]
 
 [dependencies]
