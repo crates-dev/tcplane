@@ -252,15 +252,15 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "1.28.0"
+version = "1.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7b4c33e9eccb247e9deb2b644a2e77fd03f71e6233e6c810d063d498822351d"
+checksum = "0e12cb1453c646f80c681382a4e3da4b7345e1f6d4ff6ffd6f12909f5d00740d"
 
 [[package]]
 name = "hyperlane-log"
-version = "1.1.28"
+version = "1.1.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc4b03955c5ff34f7c3b8365fefff1499895da4a42436426e2952fbceee97cf4"
+checksum = "1847789b839c793a102d3a0f38e0279c3fc273c185d0a27b3360369fcb7cc51d"
 dependencies = [
  "file-operation",
  "hyperlane-time",
@@ -609,7 +609,7 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "3.0.1"
+version = "3.0.2"
 dependencies = [
  "async-func",
  "clonelicious",
