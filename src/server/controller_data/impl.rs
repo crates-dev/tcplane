@@ -61,6 +61,14 @@ impl ArcRwLockControllerData {
     }
 
     #[inline]
+    pub async fn set_response<T: Into<ResponseData>>(&self, data: T) -> &Self {
+        let mut controller_data: RwLockWriteControllerData = self.get_write_lock().await;
+        let response: &mut Response = controller_data.get_mut_response();
+        response.set_response_data(data);
+        self
+    }
+
+    #[inline]
     pub async fn get_socket_addr(&self) -> Option<String> {
         let stream_result: OptionArcRwLockStream = self.get_stream().await;
         if stream_result.is_none() {
@@ -78,11 +86,13 @@ impl ArcRwLockControllerData {
 
     #[inline]
     pub async fn send<T: Into<ResponseData>>(&self, data: T) -> ResponseResult {
-        let mut controller_data: RwLockWriteControllerData = self.get_write_lock().await;
-        let response: &mut Response = controller_data.get_mut_response();
+        let mut response: Response = self.get_response().await;
         if let Some(stream) = self.get_stream().await {
-            let response: ResponseData = response.set_data(data).send(&stream).await?;
-            return Ok(response);
+            print_success!(3);
+            let response_data: ResponseData =
+                response.set_response_data(data).send(&stream).await?;
+            print_success!(4);
+            return Ok(response_data);
         }
         Err(server::response::error::Error::Unknown)
     }

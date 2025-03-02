@@ -5,10 +5,7 @@ impl Default for Server {
     fn default() -> Self {
         Self {
             cfg: Arc::new(RwLock::new(ServerConfig::default())),
-            func: Arc::new(RwLock::new(Box::new(
-                |_controller_data: ArcRwLockControllerData| {},
-            ))),
-            middleware: Arc::new(RwLock::new(vec![])),
+            func_list: Arc::new(RwLock::new(vec![])),
             tmp: Arc::new(RwLock::new(Tmp::default())),
         }
     }
@@ -123,25 +120,10 @@ impl Server {
         Fut: Future<Output = ()> + Send + Sync + 'static,
     {
         {
-            let mut mut_func: RwLockWriteGuard<'_, Box<dyn Func>> = self.func.write().await;
-            *mut_func = Box::new(move |arc_lock_controller_data| {
-                let _ = Box::pin(func(arc_lock_controller_data));
-            });
-        }
-        self
-    }
-
-    #[inline]
-    pub async fn middleware<F, Fut>(&mut self, func: F) -> &mut Self
-    where
-        F: AsyncFuncWithoutPin<Fut>,
-        Fut: Future<Output = ()> + Send + Sync + 'static,
-    {
-        {
-            let mut mut_middleware: RwLockWriteGuard<'_, Vec<Box<dyn Func>>> =
-                self.middleware.write().await;
-            mut_middleware.push(Box::new(move |arc_lock_controller_data| {
-                let _ = Box::pin(func(arc_lock_controller_data));
+            let mut mut_func_list: RwLockWriteGuard<'_, Vec<BoxFunc>> =
+                self.func_list.write().await;
+            mut_func_list.push(Box::new(move |arc_lock_controller_data| {
+                Box::pin(func(arc_lock_controller_data))
             }));
         }
         self
@@ -197,9 +179,7 @@ impl Server {
         while let Ok((stream, _)) = tcp_listener.accept().await {
             let tmp_arc_lock: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
             let stream_lock: ArcRwLockStream = ArcRwLockStream::from_stream(stream);
-            let middleware_arc_lock: Arc<RwLock<Vec<Box<dyn Func>>>> =
-                Arc::clone(&self.get_middleware());
-            let func_arc_lock: Arc<RwLock<Box<dyn Func>>> = Arc::clone(&self.get_func());
+            let func_list_arc_lock: Arc<RwLock<Vec<BoxFunc>>> = Arc::clone(&self.get_func_list());
             let cfg_arc_lock: Arc<RwLock<ServerConfig>> = Arc::clone(&self.get_cfg());
             let handle_request = move || async move {
                 let cfg: ServerConfig = cfg_arc_lock.read().await.clone();
@@ -212,11 +192,9 @@ impl Server {
                     .set_log(log);
                 let arc_lock_controller_data: ArcRwLockControllerData =
                     ArcRwLockControllerData::from_controller_data(controller_data);
-                for middleware in middleware_arc_lock.read().await.iter() {
-                    middleware(arc_lock_controller_data.clone());
+                for func in func_list_arc_lock.read().await.iter() {
+                    func(arc_lock_controller_data.clone()).await;
                 }
-                let func: RwLockReadGuard<'_, Box<dyn Func>> = func_arc_lock.read().await;
-                func(arc_lock_controller_data.clone());
             };
             tokio::spawn(async move {
                 handle_request().await;

@@ -38,6 +38,7 @@ pub(crate) use std::{
     fmt::{self, Display},
     future::Future,
     panic::set_hook,
+    pin::Pin,
     sync::Arc,
 };
 pub(crate) use tokio::{

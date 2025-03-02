@@ -1,4 +1,3 @@
 use crate::*;
 
-pub type FuncBox = Box<dyn Func>;
-pub type FuncArcLock = ArcRwLock<FuncBox>;
+pub type BoxFunc = Box<dyn Func + Send + 'static>;
