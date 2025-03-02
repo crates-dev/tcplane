@@ -177,7 +177,7 @@ impl Server {
         }
         let tcp_listener: TcpListener = listener_res.unwrap();
         while let Ok((stream, _)) = tcp_listener.accept().await {
-            let tmp_arc_lock: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
+            let tmp_arc_lock: ArcRwLockTmp = Arc::clone(&self.tmp);
             let stream_lock: ArcRwLockStream = ArcRwLockStream::from_stream(stream);
             let func_list_arc_lock: ArcRwlockVecBoxFunc = Arc::clone(&self.get_func_list());
             let cfg_arc_lock: ArcRwLockServerConfig = Arc::clone(&self.get_cfg());
