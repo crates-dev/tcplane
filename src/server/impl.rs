@@ -179,8 +179,8 @@ impl Server {
         while let Ok((stream, _)) = tcp_listener.accept().await {
             let tmp_arc_lock: ArcRwLock<Tmp> = Arc::clone(&self.tmp);
             let stream_lock: ArcRwLockStream = ArcRwLockStream::from_stream(stream);
-            let func_list_arc_lock: Arc<RwLock<Vec<BoxFunc>>> = Arc::clone(&self.get_func_list());
-            let cfg_arc_lock: Arc<RwLock<ServerConfig>> = Arc::clone(&self.get_cfg());
+            let func_list_arc_lock: ArcRwlockVecBoxFunc = Arc::clone(&self.get_func_list());
+            let cfg_arc_lock: ArcRwLockServerConfig = Arc::clone(&self.get_cfg());
             let handle_request = move || async move {
                 let cfg: ServerConfig = cfg_arc_lock.read().await.clone();
                 let request: Vec<u8> = Self::handle_stream(&cfg, stream_lock.clone()).await;
