@@ -3,6 +3,7 @@
 ## tcplane
 
 [![](https://img.shields.io/crates/v/tcplane.svg)](https://crates.io/crates/tcplane)
+[![](https://img.shields.io/crates/d/tcplane.svg)](https://img.shields.io/crates/d/tcplane.svg)
 [![](https://docs.rs/tcplane/badge.svg)](https://docs.rs/tcplane)
 [![](https://github.com/ltpp-universe/tcplane/workflows/Rust/badge.svg)](https://github.com/ltpp-universe/tcplane/actions?query=workflow:Rust)
 [![](https://img.shields.io/crates/l/tcplane.svg)](./LICENSE)
