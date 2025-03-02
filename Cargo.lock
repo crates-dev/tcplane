@@ -251,12 +251,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "http-constant"
-version = "1.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "590d21ec88bcc3a54fd43344c452f59a1908ead7fdf6a9d4f22dcf514efb843a"
-
-[[package]]
 name = "hyperlane-log"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -615,14 +609,13 @@ dependencies = [
 
 [[package]]
 name = "tcplane"
-version = "3.1.0"
+version = "3.1.1"
 dependencies = [
  "async-func",
  "clonelicious",
  "color-output",
  "file-operation",
  "futures",
- "http-constant",
  "hyperlane-log",
  "lombok-macros",
  "once_cell",
