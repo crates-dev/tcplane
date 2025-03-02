@@ -1,5 +1,7 @@
 use crate::*;
 
+pub type ArcRwLockServerConfig = ArcRwLock<ServerConfig>;
+
 #[derive(Clone, Debug, Lombok)]
 pub struct ServerConfig {
     pub(super) host: String,
@@ -10,5 +12,3 @@ pub struct ServerConfig {
     pub(super) interval_millis: usize,
     pub(super) print: bool,
 }
-
-pub type ArcRwLockServerConfig = ArcRwLock<ServerConfig>;
