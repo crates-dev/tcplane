@@ -9,8 +9,8 @@ pub type ArcRwLockWriteGuardTcpStream<'a> = Arc<RwLockWriteGuard<'a, TcpStream>>
 pub type OptionArcRwLockWriteGuardTcpStream<'a> = Option<ArcRwLockWriteGuardTcpStream<'a>>;
 pub type ArcMutexGuardTcpStream<'a> = Arc<MutexGuard<'a, TcpStream>>;
 pub type OptionArcMutexGuardTcpStream<'a> = Option<ArcMutexGuardTcpStream<'a>>;
-pub type ClientHost = IpAddr;
-pub type ClientPort = u16;
-
+pub type OptionClientHost = Option<IpAddr>;
+pub type OptionClientPort = Option<u16>;
+pub type OptionSocketAddr = Option<SocketAddr>;
 #[derive(Clone, Debug)]
 pub struct ArcRwLockStream(pub(super) ArcRwLock<TcpStream>);
