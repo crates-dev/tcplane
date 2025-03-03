@@ -87,13 +87,13 @@ impl ArcRwLockControllerData {
     }
 
     #[inline]
-    pub async fn get_client_host(&self) -> OptionClientHost {
+    pub async fn get_client_host(&self) -> OptionSocketHost {
         let addr: Option<SocketAddr> = self.get_client_addr().await;
         addr.map(|a| a.ip())
     }
 
     #[inline]
-    pub async fn get_client_port(&self) -> OptionClientPort {
+    pub async fn get_client_port(&self) -> OptionSocketPort {
         let addr: Option<SocketAddr> = self.get_client_addr().await;
         addr.map(|a| a.port())
     }
