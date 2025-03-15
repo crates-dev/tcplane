@@ -165,15 +165,32 @@ impl ControllerData {
     #[inline]
     pub async fn send<T: Into<ResponseData>>(&self, data: T) -> ResponseResult {
         if let Some(stream) = self.get_stream().await {
-            let response_data: ResponseData = self
-                .set_response_data(data)
+            self.set_response_data(data)
                 .await
                 .get_response()
                 .await
                 .send(&stream)
                 .await?;
-            return Ok(response_data);
+            return Ok(());
         }
-        Err(server::response::error::Error::Unknown)
+        Err(server::response::error::Error::NotFoundStream)
+    }
+
+    #[inline]
+    pub async fn close(&self) -> ResponseResult {
+        if let Some(stream) = self.get_stream().await {
+            self.get_response().await.close(&stream).await?;
+            return Ok(());
+        }
+        Err(server::response::error::Error::NotFoundStream)
+    }
+
+    #[inline]
+    pub async fn flush(&self) -> ResponseResult {
+        if let Some(stream) = self.get_stream().await {
+            self.get_response().await.flush(&stream).await?;
+            return Ok(());
+        }
+        Err(server::response::error::Error::NotFoundStream)
     }
 }

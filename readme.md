@@ -30,10 +30,15 @@ cargo add tcplane
 use tcplane::*;
 
 async fn test_func(controller_data: ControllerData) {
-    let res: ResponseData = controller_data.send("tcplane").await.unwrap();
+    controller_data.send("Tcplane").await.unwrap();
+    let response: Response = controller_data.get_response().await;
+    let response_data: &ResponseData = response.get_response_data();
     controller_data
         .log_debug(
-            format!("Response => {:?}\n", String::from_utf8_lossy(&res)),
+            format!(
+                "Response => {:?}\n",
+                String::from_utf8_lossy(&response_data)
+            ),
             log_debug_format_handler,
         )
         .await;

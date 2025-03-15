@@ -28,17 +28,30 @@ impl Response {
     #[inline]
     pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
-        let send_res: ResponseResult = stream
+        stream
             .write_all(&self.get_response_data())
             .await
-            .map_err(|err| Error::ResponseError(err.to_string()))
-            .and_then(|_| Ok(self.get_response_data().clone()));
-        send_res
+            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        Ok(())
     }
 
     #[inline]
-    pub async fn close(&mut self, stream_lock: &ArcRwLockStream) {
+    pub async fn close(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
-        stream.close().await;
+        stream
+            .shutdown()
+            .await
+            .map_err(|err| Error::CloseError(err.to_string()))?;
+        Ok(())
+    }
+
+    #[inline]
+    pub async fn flush(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
+        let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
+        stream
+            .flush()
+            .await
+            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        Ok(())
     }
 }
