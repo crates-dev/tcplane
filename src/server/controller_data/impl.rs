@@ -1,7 +1,6 @@
 use crate::*;
 
 impl InnerControllerData {
-    #[inline]
     pub fn new() -> Self {
         InnerControllerData {
             stream: None,
@@ -13,54 +12,45 @@ impl InnerControllerData {
 }
 
 impl ControllerData {
-    #[inline]
     pub(crate) fn from_controller_data(controller_data: InnerControllerData) -> Self {
         Self(Arc::new(RwLock::new(controller_data)))
     }
 
-    #[inline]
     pub async fn get_read_lock(&self) -> RwLockReadControllerData {
         let controller_data: RwLockReadControllerData = self.0.read().await;
         controller_data
     }
 
-    #[inline]
     pub async fn get_write_lock(&self) -> RwLockWriteControllerData {
         let controller_data: RwLockWriteControllerData = self.0.write().await;
         controller_data
     }
 
-    #[inline]
     pub async fn get(&self) -> InnerControllerData {
         let controller_data: InnerControllerData = self.get_read_lock().await.clone();
         controller_data
     }
 
-    #[inline]
     pub async fn get_stream(&self) -> OptionArcRwLockStream {
         let controller_data: InnerControllerData = self.get().await;
         controller_data.get_stream().clone()
     }
 
-    #[inline]
     pub async fn get_request(&self) -> Request {
         let controller_data: InnerControllerData = self.get().await;
         controller_data.get_request().clone()
     }
 
-    #[inline]
     pub async fn get_response(&self) -> Response {
         let controller_data: InnerControllerData = self.get().await;
         controller_data.get_response().clone()
     }
 
-    #[inline]
     pub async fn get_log(&self) -> Log {
         let controller_data: InnerControllerData = self.get().await;
         controller_data.get_log().clone()
     }
 
-    #[inline]
     pub(super) async fn set_response_data<T: Into<ResponseData>>(&self, data: T) -> &Self {
         let mut controller_data: RwLockWriteControllerData = self.get_write_lock().await;
         let response: &mut Response = controller_data.get_mut_response();
@@ -68,7 +58,6 @@ impl ControllerData {
         self
     }
 
-    #[inline]
     pub async fn get_socket_addr(&self) -> OptionSocketAddr {
         let stream_result: OptionArcRwLockStream = self.get_stream().await;
         if stream_result.is_none() {
@@ -83,7 +72,6 @@ impl ControllerData {
         socket_addr_opt
     }
 
-    #[inline]
     pub async fn get_socket_addr_or_default(&self) -> SocketAddr {
         let stream_result: OptionArcRwLockStream = self.get_stream().await;
         if stream_result.is_none() {
@@ -98,19 +86,16 @@ impl ControllerData {
         socket_addr
     }
 
-    #[inline]
     pub async fn get_socket_addr_string(&self) -> Option<String> {
         let socket_addr_string_opt: Option<String> =
             self.get_socket_addr().await.map(|data| data.to_string());
         socket_addr_string_opt
     }
 
-    #[inline]
     pub async fn get_socket_addr_or_default_string(&self) -> String {
         self.get_socket_addr_or_default().await.to_string()
     }
 
-    #[inline]
     pub async fn get_socket_host(&self) -> OptionSocketHost {
         let addr: OptionSocketAddr = self.get_socket_addr().await;
         let socket_host_opt: OptionSocketHost =
@@ -118,7 +103,6 @@ impl ControllerData {
         socket_host_opt
     }
 
-    #[inline]
     pub async fn get_socket_port(&self) -> OptionSocketPort {
         let addr: OptionSocketAddr = self.get_socket_addr().await;
         let socket_port_opt: OptionSocketPort =
@@ -126,7 +110,6 @@ impl ControllerData {
         socket_port_opt
     }
 
-    #[inline]
     pub async fn log_info<T, L>(&self, data: T, func: L) -> &Self
     where
         T: LogDataTrait,
@@ -138,7 +121,6 @@ impl ControllerData {
         self
     }
 
-    #[inline]
     pub async fn log_debug<T, L>(&self, data: T, func: L) -> &Self
     where
         T: LogDataTrait,
@@ -150,7 +132,6 @@ impl ControllerData {
         self
     }
 
-    #[inline]
     pub async fn log_error<T, L>(&self, data: T, func: L) -> &Self
     where
         T: LogDataTrait,
@@ -162,7 +143,6 @@ impl ControllerData {
         self
     }
 
-    #[inline]
     pub async fn send<T: Into<ResponseData>>(&self, data: T) -> ResponseResult {
         if let Some(stream) = self.get_stream().await {
             self.set_response_data(data)
@@ -176,7 +156,6 @@ impl ControllerData {
         Err(server::response::error::Error::NotFoundStream)
     }
 
-    #[inline]
     pub async fn close(&self) -> ResponseResult {
         if let Some(stream) = self.get_stream().await {
             self.get_response().await.close(&stream).await?;
@@ -185,7 +164,6 @@ impl ControllerData {
         Err(server::response::error::Error::NotFoundStream)
     }
 
-    #[inline]
     pub async fn flush(&self) -> ResponseResult {
         if let Some(stream) = self.get_stream().await {
             self.get_response().await.flush(&stream).await?;
