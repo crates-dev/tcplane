@@ -127,6 +127,33 @@ impl ControllerData {
         self
     }
 
+    pub async fn async_log_info<T, L>(&self, data: T, func: L) -> &Self
+    where
+        T: LogDataTrait,
+        L: LogFuncTrait,
+    {
+        self.get_read_lock().await.get_log().async_info(data, func);
+        self
+    }
+
+    pub async fn async_log_debug<T, L>(&self, data: T, func: L) -> &Self
+    where
+        T: LogDataTrait,
+        L: LogFuncTrait,
+    {
+        self.get_read_lock().await.get_log().async_debug(data, func);
+        self
+    }
+
+    pub async fn async_log_error<T, L>(&self, data: T, func: L) -> &Self
+    where
+        T: LogDataTrait,
+        L: LogFuncTrait,
+    {
+        self.get_read_lock().await.get_log().async_error(data, func);
+        self
+    }
+
     pub async fn send<T: Into<ResponseData>>(&self, data: T) -> ResponseResult {
         if let Some(stream) = self.get_stream().await {
             self.set_response_data(data)
