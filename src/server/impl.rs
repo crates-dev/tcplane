@@ -183,18 +183,10 @@ impl Server {
         let host: String = cfg.get_host().to_owned();
         let port: usize = *cfg.get_port();
         let addr: String = format!("{}{}{}", host, COLON_SPACE_SYMBOL, port);
-        let listener_res: Result<TcpListener, ServerError> = TcpListener::bind(&addr)
+        let tcp_listener: TcpListener = TcpListener::bind(&addr)
             .await
-            .map_err(|e| ServerError::TcpBindError(e.to_string()));
-        if let Err(err) = listener_res {
-            self.get_tmp()
-                .read()
-                .await
-                .get_log()
-                .error(&err.to_string(), common_log);
-            return self;
-        }
-        let tcp_listener: TcpListener = listener_res.unwrap();
+            .map_err(|e| ServerError::TcpBindError(e.to_string()))
+            .unwrap();
         while let Ok((stream, _)) = tcp_listener.accept().await {
             let tmp_arc_lock: ArcRwLockTmp = Arc::clone(&self.tmp);
             let stream_lock: ArcRwLockStream = ArcRwLockStream::from_stream(stream);
