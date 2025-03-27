@@ -143,7 +143,9 @@ impl Server {
         self.func_list
             .write()
             .await
-            .push(Box::new(move |ctx| Box::pin(func(ctx))));
+            .push(Box::new(move |ctx| {
+                Box::pin(func(ctx))
+            }));
         self
     }
 
@@ -195,10 +197,12 @@ impl Server {
                 let request: Vec<u8> = Self::handle_stream(&cfg, stream_lock.clone()).await;
                 let log: Log = tmp_arc_lock.read().await.get_log().clone();
                 let mut ctx: InnerContext = InnerContext::new();
-                ctx.set_stream(Some(stream_lock.clone()))
+                ctx
+                    .set_stream(Some(stream_lock.clone()))
                     .set_request(request)
                     .set_log(log);
-                let ctx: Context = Context::from_inner_context(ctx);
+                let ctx: Context =
+                    Context::from_ctx(ctx);
                 for func in func_list_arc_lock.read().await.iter() {
                     func(ctx.clone()).await;
                 }
