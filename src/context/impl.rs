@@ -7,6 +7,7 @@ impl InnerContext {
             request: Request::new(),
             response: Response::default(),
             log: Log::default(),
+            data: HashMap::default(),
         }
     }
 }
@@ -175,5 +176,36 @@ impl Context {
             return Ok(());
         }
         Err(response::error::Error::NotFoundStream)
+    }
+
+    pub async fn set_data_value<T: Any + Send + Sync + Clone>(
+        &self,
+        key: &str,
+        value: &T,
+    ) -> &Self {
+        self.get_write_lock()
+            .await
+            .get_mut_data()
+            .insert(key.to_owned(), Arc::new(value.clone()));
+        self
+    }
+
+    pub async fn get_data_value<T: Any + Send + Sync + Clone>(&self, key: &str) -> Option<T> {
+        self.get_read_lock()
+            .await
+            .get_data()
+            .get(key)
+            .and_then(|arc| arc.downcast_ref::<T>())
+            .cloned()
+    }
+
+    pub async fn remove_data_value(&self, key: &str) -> &Self {
+        self.get_write_lock().await.get_mut_data().remove(key);
+        self
+    }
+
+    pub async fn clear_data(&self) -> &Self {
+        self.get_write_lock().await.get_mut_data().clear();
+        self
     }
 }
