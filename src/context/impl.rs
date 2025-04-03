@@ -129,7 +129,11 @@ impl Context {
     where
         L: LogFuncTrait,
     {
-        self.get_read_lock().await.get_log().async_info(data, func);
+        self.get_read_lock()
+            .await
+            .get_log()
+            .async_info(data, func)
+            .await;
         self
     }
 
@@ -137,7 +141,11 @@ impl Context {
     where
         L: LogFuncTrait,
     {
-        self.get_read_lock().await.get_log().async_debug(data, func);
+        self.get_read_lock()
+            .await
+            .get_log()
+            .async_debug(data, func)
+            .await;
         self
     }
 
@@ -145,7 +153,11 @@ impl Context {
     where
         L: LogFuncTrait,
     {
-        self.get_read_lock().await.get_log().async_error(data, func);
+        self.get_read_lock()
+            .await
+            .get_log()
+            .async_error(data, func)
+            .await;
         self
     }
 
