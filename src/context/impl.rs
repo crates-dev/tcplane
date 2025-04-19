@@ -177,7 +177,7 @@ impl Context {
                 .await?;
             return Ok(());
         }
-        Err(response::error::Error::NotFoundStream)
+        Err(ResponseError::NotFoundStream)
     }
 
     pub async fn close(&self) -> ResponseResult {
@@ -185,7 +185,7 @@ impl Context {
             self.get_response().await.close(&stream).await?;
             return Ok(());
         }
-        Err(response::error::Error::NotFoundStream)
+        Err(ResponseError::NotFoundStream)
     }
 
     pub async fn flush(&self) -> ResponseResult {
@@ -193,7 +193,7 @@ impl Context {
             self.get_response().await.flush(&stream).await?;
             return Ok(());
         }
-        Err(response::error::Error::NotFoundStream)
+        Err(ResponseError::NotFoundStream)
     }
 
     pub async fn set_data_value<T: Any + Send + Sync + Clone>(

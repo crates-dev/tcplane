@@ -1,4 +1,3 @@
-use super::error::Error;
 use crate::*;
 
 impl Default for Response {
@@ -26,7 +25,7 @@ impl Response {
         stream
             .write_all(&self.get_response_data())
             .await
-            .map_err(|err| Error::ResponseError(err.to_string()))?;
+            .map_err(|err| ResponseError::ResponseError(err.to_string()))?;
         Ok(())
     }
 
@@ -35,7 +34,7 @@ impl Response {
         stream
             .shutdown()
             .await
-            .map_err(|err| Error::CloseError(err.to_string()))?;
+            .map_err(|err| ResponseError::CloseError(err.to_string()))?;
         Ok(())
     }
 
@@ -44,7 +43,7 @@ impl Response {
         stream
             .flush()
             .await
-            .map_err(|err| Error::ResponseError(err.to_string()))?;
+            .map_err(|err| ResponseError::ResponseError(err.to_string()))?;
         Ok(())
     }
 }

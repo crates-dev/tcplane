@@ -12,6 +12,3 @@ pub type OptionArcMutexGuardTcpStream<'a> = Option<ArcMutexGuardTcpStream<'a>>;
 pub type OptionSocketHost = Option<IpAddr>;
 pub type OptionSocketPort = Option<u16>;
 pub type OptionSocketAddr = Option<SocketAddr>;
-
-#[derive(Clone, Debug)]
-pub struct ArcRwLockStream(pub(super) ArcRwLock<TcpStream>);

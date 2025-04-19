@@ -1,4 +1,3 @@
-use super::r#type::ServerError;
 use crate::*;
 
 impl StdError for ServerError {}
