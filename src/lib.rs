@@ -2,7 +2,6 @@ pub(crate) mod cfg;
 pub(crate) mod common;
 pub(crate) mod config;
 pub(crate) mod context;
-pub(crate) mod error;
 pub(crate) mod handler;
 pub(crate) mod middleware;
 pub(crate) mod request;
@@ -14,7 +13,6 @@ pub(crate) mod utils;
 
 pub use config::*;
 pub use context::*;
-pub use error::*;
 pub use request::*;
 pub use response::*;
 pub use server::*;
