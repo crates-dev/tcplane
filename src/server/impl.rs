@@ -175,7 +175,7 @@ impl Server {
         buffer
     }
 
-    pub async fn listen(&mut self) -> &mut Self {
+    pub async fn run(&mut self) -> &mut Self {
         self.init().await;
         let cfg: ServerConfig = self.get_cfg().read().await.clone();
         let host: String = cfg.get_host().to_owned();
