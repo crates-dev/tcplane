@@ -29,22 +29,19 @@ impl Context {
     }
 
     pub async fn get_stream(&self) -> OptionArcRwLockStream {
-        self.get().await.get_stream().clone()
+        self.get().await.stream.clone()
     }
 
     pub async fn get_request(&self) -> Request {
-        self.get().await.get_request().clone()
+        self.get().await.request.clone()
     }
 
     pub async fn get_response(&self) -> Response {
-        self.get().await.get_response().clone()
+        self.get().await.response.clone()
     }
 
     pub(super) async fn set_response_data<T: Into<ResponseData>>(&self, data: T) -> &Self {
-        self.get_write_lock()
-            .await
-            .get_mut_response()
-            .set_response_data(data);
+        self.get_write_lock().await.response.set_response_data(data);
         self
     }
 
@@ -132,7 +129,7 @@ impl Context {
     ) -> &Self {
         self.get_write_lock()
             .await
-            .get_mut_data()
+            .data
             .insert(key.to_owned(), Arc::new(value.clone()));
         self
     }
@@ -140,19 +137,19 @@ impl Context {
     pub async fn get_data_value<T: Any + Send + Sync + Clone>(&self, key: &str) -> Option<T> {
         self.get_read_lock()
             .await
-            .get_data()
+            .data
             .get(key)
             .and_then(|arc| arc.downcast_ref::<T>())
             .cloned()
     }
 
     pub async fn remove_data_value(&self, key: &str) -> &Self {
-        self.get_write_lock().await.get_mut_data().remove(key);
+        self.get_write_lock().await.data.remove(key);
         self
     }
 
     pub async fn clear_data(&self) -> &Self {
-        self.get_write_lock().await.get_mut_data().clear();
+        self.get_write_lock().await.data.clear();
         self
     }
 }

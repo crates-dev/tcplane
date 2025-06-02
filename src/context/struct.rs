@@ -1,11 +1,11 @@
 use crate::*;
 
-#[derive(Clone, Data)]
+#[derive(Clone)]
 pub struct InnerContext {
-    pub(super) stream: OptionArcRwLockStream,
-    pub(super) request: Request,
-    pub(super) response: Response,
-    pub(super) data: HashMapArcAnySendSync,
+    pub(crate) stream: OptionArcRwLockStream,
+    pub(crate) request: Request,
+    pub(crate) response: Response,
+    pub(crate) data: HashMapArcAnySendSync,
 }
 
 #[derive(Clone)]

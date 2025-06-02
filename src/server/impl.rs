@@ -18,17 +18,17 @@ impl Server {
     where
         T: Into<String>,
     {
-        self.get_config().write().await.set_host(host.into());
+        self.config.write().await.host = host.into();
         self
     }
 
     pub async fn port(&mut self, port: usize) -> &mut Self {
-        self.get_config().write().await.set_port(port);
+        self.config.write().await.port = port;
         self
     }
 
     pub async fn buffer(&mut self, buffer_size: usize) -> &mut Self {
-        self.get_config().write().await.set_buffer_size(buffer_size);
+        self.config.write().await.buffer_size = buffer_size;
         self
     }
 
@@ -36,10 +36,7 @@ impl Server {
     where
         F: ErrorHandle + Send + Sync + 'static,
     {
-        self.get_config()
-            .write()
-            .await
-            .set_error_handle(Arc::new(func));
+        self.config.write().await.error_handle = Arc::new(func);
         self
     }
 
@@ -59,10 +56,7 @@ impl Server {
         config: &ServerConfig,
         stream_lock: ArcRwLockStream,
     ) -> Vec<u8> {
-        let buffer_size: usize = config
-            .get_buffer_size()
-            .clone()
-            .max(SPLIT_REQUEST_BYTES.len());
+        let buffer_size: usize = config.buffer_size.max(SPLIT_REQUEST_BYTES.len());
         let mut buffer: Vec<u8> = Vec::new();
         let mut tmp_buf: Vec<u8> = vec![0u8; buffer_size];
         let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
@@ -91,9 +85,9 @@ impl Server {
 
     pub async fn run(&mut self) -> &mut Self {
         self.init().await;
-        let config: ServerConfig = self.get_config().read().await.clone();
-        let host: String = config.get_host().to_owned();
-        let port: usize = *config.get_port();
+        let config: ServerConfig = self.config.read().await.clone();
+        let host: String = config.host.to_owned();
+        let port: usize = config.port;
         let addr: String = format!("{}{}{}", host, COLON_SPACE_SYMBOL, port);
         let tcp_listener: TcpListener = TcpListener::bind(&addr)
             .await
@@ -101,14 +95,14 @@ impl Server {
             .unwrap();
         while let Ok((stream, _)) = tcp_listener.accept().await {
             let stream_lock: ArcRwLockStream = ArcRwLockStream::from_stream(stream);
-            let func_list_arc_lock: ArcRwlockVecBoxFunc = Arc::clone(&self.get_func_list());
-            let config_arc_lock: ArcRwLockServerConfig = Arc::clone(&self.get_config());
+            let func_list_arc_lock: ArcRwlockVecBoxFunc = Arc::clone(&self.func_list);
+            let config_arc_lock: ArcRwLockServerConfig = Arc::clone(&self.config);
             let handle_request = move || async move {
                 let config: ServerConfig = config_arc_lock.read().await.clone();
                 let request: Vec<u8> = Self::handle_stream(&config, stream_lock.clone()).await;
                 let mut ctx: InnerContext = InnerContext::new();
-                ctx.set_stream(Some(stream_lock.clone()))
-                    .set_request(request);
+                ctx.stream = Some(stream_lock.clone());
+                ctx.request = request;
                 let ctx: Context = Context::from_inner_context(ctx);
                 for func in func_list_arc_lock.read().await.iter() {
                     func(ctx.clone()).await;
@@ -120,8 +114,7 @@ impl Server {
     }
 
     async fn init_panic_hook(&self) {
-        let error_handle: ArcErrorHandle =
-            self.get_config().read().await.get_error_handle().clone();
+        let error_handle: ArcErrorHandle = self.config.read().await.error_handle.clone();
         set_hook(Box::new(move |err| {
             let data: String = err.to_string();
             error_handle(data);
