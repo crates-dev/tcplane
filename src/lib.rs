@@ -1,3 +1,12 @@
+//! tcplane
+//!
+//! tcplane is a lightweight and high-performance Rust TCP server
+//! library designed to simplify network service development.
+//! It supports TCP communication, data stream management,
+//! and connection handling, focusing on providing efficient
+//! low-level network connections and data transmission capabilities,
+//! making it ideal for building modern network services.
+
 pub(crate) mod cfg;
 pub(crate) mod common;
 pub(crate) mod config;

@@ -1,5 +1,6 @@
 use crate::*;
 
+/// Default implementation for Server.
 impl Default for Server {
     fn default() -> Self {
         Self {
@@ -9,11 +10,26 @@ impl Default for Server {
     }
 }
 
+/// Server implementation containing all server operations.
 impl Server {
+    /// Creates a new Server instance with default configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `Server` - New server instance with default settings.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Sets the server host address.
+    ///
+    /// # Arguments
+    ///
+    /// - `T` - Type that can be converted into String (host address)
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self` - Mutable reference to self for method chaining.
     pub async fn host<T>(&mut self, host: T) -> &mut Self
     where
         T: Into<String>,
@@ -22,16 +38,43 @@ impl Server {
         self
     }
 
+    /// Sets the server listening port.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - Port number to listen on
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self` - Mutable reference to self for method chaining.
     pub async fn port(&mut self, port: usize) -> &mut Self {
         self.config.write().await.port = port;
         self
     }
 
+    /// Sets the network buffer size for the server.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - Buffer size in bytes
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self` - Mutable reference to self for method chaining.
     pub async fn buffer(&mut self, buffer_size: usize) -> &mut Self {
         self.config.write().await.buffer_size = buffer_size;
         self
     }
 
+    /// Sets the error handler for the server.
+    ///
+    /// # Arguments
+    ///
+    /// - `F` - Error handler function implementing ErrorHandle trait
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - Immutable reference to self for method chaining.
     pub async fn error_handle<F>(&self, func: F) -> &Self
     where
         F: ErrorHandle + Send + Sync + 'static,
@@ -40,6 +83,16 @@ impl Server {
         self
     }
 
+    /// Adds an async function to the server's handler list.
+    ///
+    /// # Arguments
+    ///
+    /// - `F` - Async function type implementing AsyncFuncWithoutPin trait
+    /// - `Fut` - Future type returned by the async function
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self` - Mutable reference to self for method chaining.
     pub async fn func<F, Fut>(&mut self, func: F) -> &mut Self
     where
         F: AsyncFuncWithoutPin<Fut>,
@@ -52,6 +105,16 @@ impl Server {
         self
     }
 
+    /// Handles incoming TCP stream and reads data into buffer.
+    ///
+    /// # Arguments
+    ///
+    /// - `&ServerConfig` - Server configuration reference
+    /// - `ArcRwLockStream` - Thread-safe TCP stream wrapper
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<u8>` - Byte buffer containing the received data
     pub(super) async fn handle_stream(
         config: &ServerConfig,
         stream_lock: ArcRwLockStream,
@@ -83,6 +146,11 @@ impl Server {
         buffer
     }
 
+    /// Starts the server and begins accepting connections.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self` - Mutable reference to self for method chaining.
     pub async fn run(&mut self) -> &mut Self {
         self.init().await;
         let config: ServerConfig = self.config.read().await.clone();
@@ -113,6 +181,11 @@ impl Server {
         self
     }
 
+    /// Initializes the panic hook to use the configured error handler.
+    ///
+    /// # Returns
+    ///
+    /// - `()` - This function does not return any meaningful value.
     async fn init_panic_hook(&self) {
         let error_handle: ArcErrorHandle = self.config.read().await.error_handle.clone();
         set_hook(Box::new(move |err| {
@@ -121,6 +194,11 @@ impl Server {
         }));
     }
 
+    /// Initializes server components including panic hook.
+    ///
+    /// # Returns
+    ///
+    /// - `()` - This function does not return any meaningful value.
     async fn init(&self) {
         self.init_panic_hook().await;
     }
