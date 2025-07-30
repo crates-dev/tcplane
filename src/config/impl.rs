@@ -1,5 +1,8 @@
 use crate::*;
 
+/// Implements default values for `ServerConfig`.
+///
+/// Provides a default server configuration with default host address, port, buffer size, and error handling function.
 impl Default for ServerConfig {
     fn default() -> Self {
         Self {
