@@ -1,12 +1,13 @@
 [package]
 name = "tcplane"
-version = "4.1.1"
+version = "4.1.2"
+readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
 license = "MIT"
 description = """tcplane is a lightweight and high-performance Rust TCP server library designed to simplify network service development. It supports TCP communication, data stream management, and connection handling, focusing on providing efficient low-level network connections and data transmission capabilities, making it ideal for building modern network services."""
 keywords = ["http", "request", "response", "tcp", "redirect"]
-repository = "https://github.com/eastspire/tcplane.git"
+repository = "https://github.com/crates-dev/tcplane.git"
 categories = ["network-programming", "web-programming"]
 exclude = [
     "target",
@@ -18,7 +19,7 @@ exclude = [
 ]
 
 [dependencies]
-tokio = { version = "1.47.0", features = ["full"] }
+tokio = { version = "1.47.1", features = ["full"] }
 
 [profile.dev]
 incremental = false
