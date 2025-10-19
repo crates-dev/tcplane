@@ -149,7 +149,7 @@ impl Server {
         let config: ServerConfig = self.config.read().await.clone();
         let host: String = config.host.to_owned();
         let port: usize = config.port;
-        let addr: String = format!("{}{}{}", host, COLON_SPACE_SYMBOL, port);
+        let addr: String = format!("{host}{COLON_SPACE_SYMBOL}{port}");
         let tcp_listener: TcpListener = TcpListener::bind(&addr)
             .await
             .map_err(|e| ServerError::TcpBindError(e.to_string()))
