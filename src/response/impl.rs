@@ -1,11 +1,5 @@
 use crate::*;
 
-impl Default for Response {
-    fn default() -> Self {
-        Self(Vec::new())
-    }
-}
-
 impl Response {
     pub fn from<T: Into<ResponseData>>(data: T) -> Self {
         Self(data.into())
@@ -23,7 +17,7 @@ impl Response {
     pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
         stream
-            .write_all(&self.get_response_data())
+            .write_all(self.get_response_data())
             .await
             .map_err(|err| ResponseError::ResponseError(err.to_string()))?;
         Ok(())

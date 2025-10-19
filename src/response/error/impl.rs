@@ -10,7 +10,7 @@ impl Display for ResponseError {
             Self::NotFoundStream => {
                 write!(f, "Not found stream")
             }
-            Self::Unknown => write!(f, "{}", "Unknown"),
+            Self::Unknown => write!(f, "Unknown"),
         }
     }
 }

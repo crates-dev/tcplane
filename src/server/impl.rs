@@ -123,25 +123,18 @@ impl Server {
         let mut buffer: Vec<u8> = Vec::new();
         let mut tmp_buf: Vec<u8> = vec![0u8; buffer_size];
         let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
-        loop {
-            match stream.read(&mut tmp_buf).await {
-                Ok(n) => {
-                    let old_len: usize = tmp_buf.len();
-                    tmp_buf = remove_trailing_zeros(&mut tmp_buf);
-                    let new_len: usize = tmp_buf.len();
-                    if n == 0 {
-                        break;
-                    }
-                    if old_len != new_len || tmp_buf.ends_with(SPLIT_REQUEST_BYTES) {
-                        buffer.extend_from_slice(&tmp_buf[..n - SPLIT_REQUEST_BYTES.len()]);
-                        break;
-                    }
-                    buffer.extend_from_slice(&tmp_buf[..n]);
-                }
-                _ => {
-                    break;
-                }
+        while let Ok(n) = stream.read(&mut tmp_buf).await {
+            let old_len: usize = tmp_buf.len();
+            tmp_buf = remove_trailing_zeros(&mut tmp_buf);
+            let new_len: usize = tmp_buf.len();
+            if n == 0 {
+                break;
             }
+            if old_len != new_len || tmp_buf.ends_with(SPLIT_REQUEST_BYTES) {
+                buffer.extend_from_slice(&tmp_buf[..n - SPLIT_REQUEST_BYTES.len()]);
+                break;
+            }
+            buffer.extend_from_slice(&tmp_buf[..n]);
         }
         buffer
     }

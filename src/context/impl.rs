@@ -1,6 +1,17 @@
 use crate::*;
 
 /// Manages the internal state of the context.
+impl Default for InnerContext {
+    fn default() -> Self {
+        Self {
+            stream: None,
+            request: Request::new(),
+            response: Response::default(),
+            data: HashMap::default(),
+        }
+    }
+}
+
 impl InnerContext {
     /// Creates a new `InnerContext` with default values.
     ///
@@ -8,12 +19,7 @@ impl InnerContext {
     ///
     /// - `InnerContext` - A new instance of `InnerContext`.
     pub fn new() -> Self {
-        InnerContext {
-            stream: None,
-            request: Request::new(),
-            response: Response::default(),
-            data: HashMap::default(),
-        }
+        Self::default()
     }
 }
 
@@ -136,9 +142,7 @@ impl Context {
     /// - `OptionSocketAddr` - The optional socket address.
     pub async fn get_socket_addr(&self) -> OptionSocketAddr {
         let stream_result: OptionArcRwLockStream = self.get_stream().await;
-        if stream_result.is_none() {
-            return None;
-        }
+        stream_result.as_ref()?;
         let socket_addr_opt: OptionSocketAddr = stream_result
             .unwrap()
             .get_read_lock()
