@@ -4,6 +4,7 @@ use crate::*;
 ///
 /// Provides a default server configuration with default host address, port, buffer size, and error handling function.
 impl Default for ServerConfig {
+    #[inline(always)]
     fn default() -> Self {
         Self {
             host: DEFAULT_HOST.to_owned(),

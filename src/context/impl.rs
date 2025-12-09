@@ -2,6 +2,7 @@ use crate::*;
 
 /// Manages the internal state of the context.
 impl Default for InnerContext {
+    #[inline(always)]
     fn default() -> Self {
         Self {
             stream: None,
@@ -18,6 +19,7 @@ impl InnerContext {
     /// # Returns
     ///
     /// - `InnerContext` - A new instance of `InnerContext`.
+    #[inline(always)]
     pub fn new() -> Self {
         Self::default()
     }

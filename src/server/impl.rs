@@ -2,6 +2,7 @@ use crate::*;
 
 /// Default implementation for Server.
 impl Default for Server {
+    #[inline(always)]
     fn default() -> Self {
         Self {
             config: Arc::new(RwLock::new(ServerConfig::default())),
