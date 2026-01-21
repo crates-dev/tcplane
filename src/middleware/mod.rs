@@ -1,3 +1,3 @@
-pub(crate) mod r#type;
+mod r#type;
 
 pub(crate) use r#type::*;
