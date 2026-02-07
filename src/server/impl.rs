@@ -4,10 +4,20 @@ use crate::*;
 impl Default for ServerData {
     fn default() -> Self {
         Self {
-            config: ServerConfig::new(),
+            server_config: ServerConfigData::default(),
             hook: vec![],
             task_panic: vec![],
             read_error: vec![],
+        }
+    }
+}
+
+/// Provides a default implementation for ServerControlHook.
+impl Default for ServerControlHook {
+    fn default() -> Self {
+        Self {
+            wait_hook: Arc::new(|| Box::pin(async {})),
+            shutdown_hook: Arc::new(|| Box::pin(async {})),
         }
     }
 }
@@ -18,8 +28,17 @@ impl ServerData {
     /// # Returns
     ///
     /// - `&ServerConfig` - Reference to the configuration.
-    pub(crate) fn get_config(&self) -> &ServerConfig {
-        &self.config
+    pub(crate) fn get_config(&self) -> &ServerConfigData {
+        &self.server_config
+    }
+
+    /// Gets a mutable reference to the server configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut ServerConfigData` - Mutable reference to the server configuration.
+    pub(crate) fn get_mut_server_config(&mut self) -> &mut ServerConfigData {
+        &mut self.server_config
     }
 
     /// Gets a reference to the hook list.
@@ -113,6 +132,20 @@ impl Server {
         self.0.write().await
     }
 
+    /// Sets the server configuration.
+    ///
+    /// # Arguments
+    ///
+    /// - `ServerConfig` - The server configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - Reference to self for method chaining.
+    pub async fn server_config(&self, config: ServerConfig) -> &Self {
+        *self.write().await.get_mut_server_config() = config.get_data().await;
+        self
+    }
+
     /// Constructs a bind address string from host and port。
     ///
     /// # Arguments
@@ -131,20 +164,6 @@ impl Server {
         format!("{}{}{}", host.as_ref(), COLON, port)
     }
 
-    /// Adds a hook to the server's hook list.
-    ///
-    /// # Arguments
-    ///
-    /// - `ServerHookHandler` - The hook to add.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - Reference to self for method chaining.
-    pub async fn handle(&self, hook: ServerHookHandler) -> &Self {
-        self.write().await.get_mut_hook().push(hook);
-        self
-    }
-
     /// Adds a typed hook to the server's hook list.
     ///
     /// # Arguments
@@ -158,7 +177,11 @@ impl Server {
     where
         H: ServerHook,
     {
-        self.handle(server_hook_factory::<H>()).await
+        self.write()
+            .await
+            .get_mut_hook()
+            .push(server_hook_factory::<H>());
+        self
     }
 
     /// Adds a panic handler to the server's task panic handler list.
@@ -207,7 +230,7 @@ impl Server {
     ///
     /// - `Result<TcpListener, ServerError>` - The listener on success, or an error on failure.
     async fn create_tcp_listener(&self) -> Result<TcpListener, ServerError> {
-        let config: ServerConfigData = self.read().await.get_config().get_data().await;
+        let config: ServerConfigData = self.read().await.get_config().clone();
         let host: String = config.host;
         let port: u16 = config.port;
         let addr: String = Self::get_bind_addr(&host, port);
@@ -225,7 +248,7 @@ impl Server {
         let server: Server = self.clone();
         let hook: ServerHookList = self.read().await.get_hook().clone();
         let task_panic: ServerHookList = self.read().await.get_task_panic().clone();
-        let buffer_size: usize = self.read().await.get_config().get_data().await.buffer_size;
+        let buffer_size: usize = self.read().await.get_config().buffer_size;
         spawn(async move {
             server
                 .handle_connection(stream, hook, task_panic, buffer_size)
@@ -358,7 +381,6 @@ impl Server {
         let server: Server = self.clone();
         let (wait_sender, wait_receiver) = channel(());
         let (shutdown_sender, mut shutdown_receiver) = channel(());
-
         let accept_connections: JoinHandle<()> = spawn(async move {
             loop {
                 tokio::select! {
@@ -378,25 +400,21 @@ impl Server {
             }
             let _ = wait_sender.send(());
         });
-
         let wait_hook = Arc::new(move || {
             let mut wait_receiver_clone = wait_receiver.clone();
             Box::pin(async move {
                 let _ = wait_receiver_clone.changed().await;
             }) as Pin<Box<dyn Future<Output = ()> + Send + 'static>>
         });
-
         let shutdown_hook = Arc::new(move || {
             let shutdown_sender_clone: Sender<()> = shutdown_sender.clone();
             Box::pin(async move {
                 let _ = shutdown_sender_clone.send(());
             }) as Pin<Box<dyn Future<Output = ()> + Send + 'static>>
         });
-
         spawn(async move {
             let _ = accept_connections.await;
         });
-
         Ok(ServerControlHook {
             wait_hook,
             shutdown_hook,

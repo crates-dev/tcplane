@@ -36,6 +36,7 @@ impl ServerConfig {
     /// # Returns
     ///
     /// - `Self` - A new ServerConfig instance.
+    #[inline(always)]
     pub fn new() -> Self {
         Self::default()
     }

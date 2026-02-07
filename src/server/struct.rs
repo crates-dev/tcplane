@@ -8,7 +8,7 @@ use crate::*;
 #[derive(Clone)]
 pub(crate) struct ServerData {
     /// Stores the server's configuration settings, such as address, port, and buffer size.
-    pub(crate) config: ServerConfig,
+    pub(crate) server_config: ServerConfigData,
     /// A collection of request hooks that are invoked for each incoming connection.
     pub(crate) hook: ServerHookList,
     /// A collection of task panic handlers that are invoked when a panic occurs during connection processing.
@@ -34,13 +34,4 @@ pub struct ServerControlHook {
     /// A hook that, when called, initiates a graceful shutdown of the server.
     pub(crate) shutdown_hook:
         Arc<dyn Fn() -> Pin<Box<dyn Future<Output = ()> + Send + 'static>> + Send + Sync>,
-}
-
-impl Default for ServerControlHook {
-    fn default() -> Self {
-        Self {
-            wait_hook: Arc::new(|| Box::pin(async {})),
-            shutdown_hook: Arc::new(|| Box::pin(async {})),
-        }
-    }
 }
