@@ -405,14 +405,15 @@ impl Context {
     ///
     /// # Arguments
     ///
-    /// - `impl AsRef<str>` - The key for the data.
+    /// - `AsRef<str>` - The key for the data.
     ///
     /// # Returns
     ///
     /// - `Option<V>` - The data value if found and successfully downcasted, otherwise `None`.
-    pub async fn try_get_data<V>(&self, key: impl AsRef<str>) -> Option<V>
+    pub async fn try_get_data<V, K>(&self, key: K) -> Option<V>
     where
         V: Any + Send + Sync + Clone,
+        K: AsRef<str>,
     {
         self.read()
             .await
@@ -426,7 +427,7 @@ impl Context {
     ///
     /// # Arguments
     ///
-    /// - `impl AsRef<str>` - The key for the data.
+    /// - `AsRef<str>` - The key for the data.
     ///
     /// # Returns
     ///
@@ -435,9 +436,10 @@ impl Context {
     /// # Panics
     ///
     /// Panics if the data is not found or cannot be downcasted.
-    pub async fn get_data_value<V>(&self, key: impl AsRef<str>) -> V
+    pub async fn get_data_value<V, K>(&self, key: K) -> V
     where
         V: Any + Send + Sync + Clone,
+        K: AsRef<str>,
     {
         self.try_get_data(key).await.unwrap()
     }
@@ -446,7 +448,7 @@ impl Context {
     ///
     /// # Arguments
     ///
-    /// - `impl AsRef<str>` - The key of the data to remove.
+    /// - `AsRef<str>` - The key of the data to remove.
     ///
     /// # Returns
     ///

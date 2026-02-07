@@ -6,12 +6,15 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `T` - Data that can be converted into ResponseData.
+    /// - `Into<ResponseData>` - Data that can be converted into ResponseData.
     ///
     /// # Returns
     ///
     /// - `Self` - A new Response instance.
-    pub fn from<T: Into<ResponseData>>(data: T) -> Self {
+    pub fn from<T>(data: T) -> Self
+    where
+        T: Into<ResponseData>,
+    {
         Self(data.into())
     }
 
@@ -37,12 +40,15 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `T` - Data that can be converted into ResponseData.
+    /// - `Into<ResponseData>` - Data that can be converted into ResponseData.
     ///
     /// # Returns
     ///
     /// - `&mut Self` - Mutable reference to self for method chaining.
-    pub fn set_data<T: Into<ResponseData>>(&mut self, data: T) -> &mut Self {
+    pub fn set_data<T>(&mut self, data: T) -> &mut Self
+    where
+        T: Into<ResponseData>,
+    {
         self.0 = data.into();
         self
     }

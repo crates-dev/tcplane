@@ -50,7 +50,7 @@ impl ServerHook for ErrorHandler {
     }
 
     async fn handle(self, ctx: &Context) {
-        if let Some(error) = ctx.try_get_data::<String>("error").await {
+        if let Some(error) = ctx.try_get_data::<String, _>("error").await {
             eprintln!("{error}");
             let _ = std::io::Write::flush(&mut std::io::stderr());
         }
