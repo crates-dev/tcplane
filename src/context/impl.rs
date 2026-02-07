@@ -75,8 +75,10 @@ impl From<ArcRwLockStream> for Context {
     /// - `Context` - A new Context instance with the stream set.
     #[inline(always)]
     fn from(stream: ArcRwLockStream) -> Self {
-        let mut data: ContextData = ContextData::default();
-        data.stream = Some(stream);
+        let data: ContextData = ContextData {
+            stream: Some(stream),
+            ..Default::default()
+        };
         Self::from(data)
     }
 }

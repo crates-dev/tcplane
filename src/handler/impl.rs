@@ -1,10 +1,9 @@
 use crate::*;
 
 /// Implementation of server hook handler factory functions.
-
 /// Creates a server hook handler factory from a type implementing `ServerHook`.
 ///
-/// # Type Parameters
+/// # Arguments
 ///
 /// - `ServerHook` - The hook type that implements `ServerHook`.
 ///

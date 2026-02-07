@@ -147,7 +147,7 @@ impl Server {
 
     /// Adds a typed hook to the server's hook list.
     ///
-    /// # Type Parameters
+    /// # Arguments
     ///
     /// - `ServerHook` - The hook type that implements `ServerHook`.
     ///
@@ -163,7 +163,7 @@ impl Server {
 
     /// Adds a panic handler to the server's task panic handler list.
     ///
-    /// # Type Parameters
+    /// # Arguments
     ///
     /// - `ServerHook` - The handler type that implements `ServerHook`.
     ///
@@ -183,7 +183,7 @@ impl Server {
 
     /// Adds an error handler to the server's error handler list.
     ///
-    /// # Type Parameters
+    /// # Arguments
     ///
     /// - `ServerHook` - The handler type that implements `ServerHook`.
     ///
