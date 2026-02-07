@@ -1,16 +1,22 @@
 use crate::*;
 
-/// Server configuration parameters.
+/// Represents the inner, mutable server configuration.
 ///
-/// Contains all settings required for server initialization and operation.
+/// This structure holds all the settings for the TCP server,
+/// including network parameters and buffer sizes.
 #[derive(Clone)]
-pub struct ServerConfig {
-    /// The server host address.
+pub(crate) struct ServerConfigData {
+    /// The host address the server will bind to.
     pub(crate) host: String,
-    /// The server listening port.
-    pub(crate) port: usize,
-    /// Network buffer size in bytes.
+    /// The port number the server will listen on.
+    pub(crate) port: u16,
+    /// The network buffer size for read operations.
     pub(crate) buffer_size: usize,
-    /// Error handling function for server operations.
-    pub(crate) error_handle: ArcErrorHandle,
 }
+
+/// Represents the thread-safe, shareable server configuration.
+///
+/// This structure wraps `ServerConfigData` in an `Arc<RwLock<ServerConfigData>>`
+/// to allow for safe concurrent access and modification of the server settings.
+#[derive(Clone)]
+pub struct ServerConfig(pub(super) ArcRwLock<ServerConfigData>);

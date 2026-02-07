@@ -1,25 +1,28 @@
 use crate::*;
 
-/// Internal context structure.
+/// Represents the internal state of the connection context.
 ///
-/// Stores core data during request processing, including stream, request, response, and data.
+/// This structure holds all the data associated with a single connection,
+/// including the stream, request, response, and any custom data.
 #[derive(Clone)]
-pub struct InnerContext {
-    /// The stream object for network communication.
-    pub(crate) stream: OptionArcRwLockStream,
-    /// The request object containing client-sent request information.
+pub(crate) struct ContextData {
+    /// A flag indicating whether the connection handling has been aborted.
+    pub(crate) aborted: bool,
+    /// A flag indicating whether the connection has been closed.
+    pub(crate) closed: bool,
+    /// The underlying network stream for the connection.
+    pub(crate) stream: Option<ArcRwLockStream>,
+    /// The incoming request data.
     pub(crate) request: Request,
-    /// The response object for building and sending responses to clients.
+    /// The outgoing response.
     pub(crate) response: Response,
-    /// Data storage for holding arbitrary type data during request processing.
-    pub(crate) data: HashMapArcAnySendSync,
+    /// Attributes storage for holding arbitrary type data during connection processing.
+    pub(crate) attributes: HashMapArcAnySendSync,
 }
 
-/// Context structure.
+/// The main connection context, providing thread-safe access to connection data.
 ///
-/// Wraps `InnerContext` providing thread-safe shared access.
+/// This is a wrapper around `ContextData` that uses an `Arc<RwLock<ContextData>>` to allow
+/// for shared, mutable access across asynchronous tasks.
 #[derive(Clone)]
-pub struct Context(
-    /// The inner context, wrapped in an ArcRwLock for thread-safe access.
-    pub(super) ArcRwLock<InnerContext>,
-);
+pub struct Context(pub(super) ArcRwLock<ContextData>);

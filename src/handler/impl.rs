@@ -1,24 +1,24 @@
 use crate::*;
 
-/// Implementation of the `ErrorHandle` trait.
-///
-/// Provides error handling functionality for function types.
-impl<T> ErrorHandle for T where T: Fn(String) {}
+/// Implementation of server hook handler factory functions.
 
-/// Implementation of the `Func` trait.
+/// Creates a server hook handler factory from a type implementing `ServerHook`.
 ///
-/// Provides context handling functionality for function types.
-impl<F> Func for F where
-    F: Fn(Context) -> Pin<Box<dyn Future<Output = ()> + Send + 'static>> + Send + Sync + 'static
-{
-}
-
-/// Implementation of the `AsyncFuncWithoutPin` trait.
+/// # Type Parameters
 ///
-/// Provides context handling functionality for async function types.
-impl<F, Fut> AsyncFuncWithoutPin<Fut> for F
+/// - `ServerHook` - The hook type that implements `ServerHook`.
+///
+/// # Returns
+///
+/// - `ServerHookHandler` - A boxed handler function.
+pub fn server_hook_factory<H>() -> ServerHookHandler
 where
-    F: Fn(Context) -> Fut + Send + Sync + 'static,
-    Fut: Future<Output = ()> + Send + 'static,
+    H: ServerHook,
 {
+    Arc::new(|ctx: Context| {
+        Box::pin(async move {
+            let hook: H = H::new(&ctx).await;
+            hook.handle(&ctx).await;
+        })
+    })
 }

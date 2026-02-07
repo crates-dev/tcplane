@@ -10,6 +10,7 @@
 mod common;
 mod config;
 mod context;
+mod error;
 mod handler;
 mod middleware;
 mod request;
@@ -18,11 +19,12 @@ mod server;
 mod stream;
 mod utils;
 
-pub use {config::*, context::*, request::*, response::*, server::*, stream::*, utils::*};
+pub use {
+    common::*, config::*, context::*, error::*, handler::*, middleware::*, request::*, response::*,
+    server::*, stream::*, utils::*,
+};
 
 pub use tokio;
-
-use {common::*, handler::*, middleware::*};
 
 use std::{
     any::Any,
@@ -30,8 +32,7 @@ use std::{
     error::Error as StdError,
     fmt::{self, Display},
     future::Future,
-    net::{IpAddr, Ipv4Addr, SocketAddr, SocketAddrV4},
-    panic::set_hook,
+    net::SocketAddr,
     pin::Pin,
     sync::Arc,
 };
@@ -39,5 +40,10 @@ use std::{
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     net::{TcpListener, TcpStream},
-    sync::{MutexGuard, RwLock, RwLockReadGuard, RwLockWriteGuard},
+    spawn,
+    sync::{
+        RwLock, RwLockReadGuard, RwLockWriteGuard,
+        watch::{Sender, channel},
+    },
+    task::JoinHandle,
 };

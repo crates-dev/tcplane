@@ -1,210 +1,418 @@
 use crate::*;
 
-impl StdError for ServerError {}
-
-impl Display for ServerError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::TcpBindError(data) => write!(f, "Tcp bind error{COLON_SPACE}{data}"),
-            Self::Unknown => write!(f, "Unknown"),
-        }
-    }
-}
-
-/// Default implementation for Server.
-impl Default for Server {
-    #[inline(always)]
+/// Provides a default implementation for ServerData.
+impl Default for ServerData {
     fn default() -> Self {
         Self {
-            config: Arc::new(RwLock::new(ServerConfig::default())),
-            func_list: Arc::new(RwLock::new(vec![])),
+            config: ServerConfig::new(),
+            hook: vec![],
+            task_panic: vec![],
+            read_error: vec![],
         }
     }
 }
 
-/// Server implementation containing all server operations.
-impl Server {
-    /// Creates a new Server instance with default configuration.
+impl ServerData {
+    /// Gets a reference to the configuration.
     ///
     /// # Returns
     ///
-    /// - `Server` - New server instance with default settings.
-    pub async fn new() -> Self {
+    /// - `&ServerConfig` - Reference to the configuration.
+    pub(crate) fn get_config(&self) -> &ServerConfig {
+        &self.config
+    }
+
+    /// Gets a reference to the hook list.
+    ///
+    /// # Returns
+    ///
+    /// - `&ServerHookList` - Reference to the hook list.
+    pub(crate) fn get_hook(&self) -> &ServerHookList {
+        &self.hook
+    }
+
+    /// Gets a mutable reference to the hook list.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut ServerHookList` - Mutable reference to the hook list.
+    pub(crate) fn get_mut_hook(&mut self) -> &mut ServerHookList {
+        &mut self.hook
+    }
+
+    /// Gets a reference to the task panic handler list.
+    ///
+    /// # Returns
+    ///
+    /// - `&ServerHookList` - Reference to the task panic handler list.
+    pub(crate) fn get_task_panic(&self) -> &ServerHookList {
+        &self.task_panic
+    }
+
+    /// Gets a mutable reference to the task panic handler list.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut ServerHookList` - Mutable reference to the task panic handler list.
+    pub(crate) fn get_mut_task_panic(&mut self) -> &mut ServerHookList {
+        &mut self.task_panic
+    }
+
+    /// Gets a reference to the read error handler list.
+    ///
+    /// # Returns
+    ///
+    /// - `&ServerHookList` - Reference to the read error handler list.
+    pub(crate) fn get_read_error(&self) -> &ServerHookList {
+        &self.read_error
+    }
+
+    /// Gets a mutable reference to the read error handler list.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut ServerHookList` - Mutable reference to the read error handler list.
+    pub(crate) fn get_mut_read_error(&mut self) -> &mut ServerHookList {
+        &mut self.read_error
+    }
+}
+
+/// Provides a default implementation for Server.
+impl Default for Server {
+    fn default() -> Self {
+        Self(Arc::new(RwLock::new(ServerData::default())))
+    }
+}
+
+/// Implementation of methods for the Server structure.
+impl Server {
+    /// Creates a new Server instance with default settings.
+    ///
+    /// # Returns
+    ///
+    /// - `Self` - A new Server instance.
+    pub fn new() -> Self {
         Self::default()
     }
 
-    /// Sets the server host address.
-    ///
-    /// # Arguments
-    ///
-    /// - `T` - Type that can be converted into String (host address)
+    /// Acquires a read lock on the inner server data.
     ///
     /// # Returns
     ///
-    /// - `&mut Self` - Mutable reference to self for method chaining.
-    pub async fn host<T>(&mut self, host: T) -> &mut Self
+    /// - `ArcRwLockReadGuard<ServerData>` - The read guard.
+    pub(crate) async fn read(&self) -> ArcRwLockReadGuard<'_, ServerData> {
+        self.0.read().await
+    }
+
+    /// Acquires a write lock on the inner server data.
+    ///
+    /// # Returns
+    ///
+    /// - `ArcRwLockWriteGuard<ServerData>` - The write guard.
+    pub(crate) async fn write(&self) -> ArcRwLockWriteGuard<'_, ServerData> {
+        self.0.write().await
+    }
+
+    /// Constructs a bind address string from host and port。
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - Type that can be referenced as a string slice.
+    /// - `u16` - The port number.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The formatted bind address.
+    #[inline(always)]
+    pub fn get_bind_addr<H>(host: H, port: u16) -> String
     where
-        T: Into<String>,
+        H: AsRef<str>,
     {
-        self.config.write().await.host = host.into();
-        self
+        format!("{}{}{}", host.as_ref(), COLON, port)
     }
 
-    /// Sets the server listening port.
+    /// Adds a hook to the server's hook list.
     ///
     /// # Arguments
     ///
-    /// - `usize` - Port number to listen on
+    /// - `ServerHookHandler` - The hook to add.
     ///
     /// # Returns
     ///
-    /// - `&mut Self` - Mutable reference to self for method chaining.
-    pub async fn port(&mut self, port: usize) -> &mut Self {
-        self.config.write().await.port = port;
+    /// - `&Self` - Reference to self for method chaining.
+    pub async fn handle(&self, hook: ServerHookHandler) -> &Self {
+        self.write().await.get_mut_hook().push(hook);
         self
     }
 
-    /// Sets the network buffer size for the server.
+    /// Adds a typed hook to the server's hook list.
     ///
-    /// # Arguments
+    /// # Type Parameters
     ///
-    /// - `usize` - Buffer size in bytes
-    ///
-    /// # Returns
-    ///
-    /// - `&mut Self` - Mutable reference to self for method chaining.
-    pub async fn buffer(&mut self, buffer_size: usize) -> &mut Self {
-        self.config.write().await.buffer_size = buffer_size;
-        self
-    }
-
-    /// Sets the error handler for the server.
-    ///
-    /// # Arguments
-    ///
-    /// - `F` - Error handler function implementing ErrorHandle trait
+    /// - `ServerHook` - The hook type that implements `ServerHook`.
     ///
     /// # Returns
     ///
-    /// - `&Self` - Immutable reference to self for method chaining.
-    pub async fn error_handle<F>(&self, func: F) -> &Self
+    /// - `&Self` - Reference to self for method chaining.
+    pub async fn hook<H>(&self) -> &Self
     where
-        F: ErrorHandle + Send + Sync + 'static,
+        H: ServerHook,
     {
-        self.config.write().await.error_handle = Arc::new(func);
-        self
+        self.handle(server_hook_factory::<H>()).await
     }
 
-    /// Adds an async function to the server's handler list.
+    /// Adds a panic handler to the server's task panic handler list.
     ///
-    /// # Arguments
+    /// # Type Parameters
     ///
-    /// - `F` - Async function type implementing AsyncFuncWithoutPin trait
-    /// - `Fut` - Future type returned by the async function
+    /// - `ServerHook` - The handler type that implements `ServerHook`.
     ///
     /// # Returns
     ///
-    /// - `&mut Self` - Mutable reference to self for method chaining.
-    pub async fn func<F, Fut>(&mut self, func: F) -> &mut Self
+    /// - `&Self` - Reference to self for method chaining.
+    pub async fn task_panic<H>(&self) -> &Self
     where
-        F: AsyncFuncWithoutPin<Fut>,
-        Fut: Future<Output = ()> + Send + Sync + 'static,
+        H: ServerHook,
     {
-        self.func_list
-            .write()
+        self.write()
             .await
-            .push(Box::new(move |ctx| Box::pin(func(ctx))));
+            .get_mut_task_panic()
+            .push(server_hook_factory::<H>());
         self
     }
 
-    /// Handles incoming TCP stream and reads data into buffer.
+    /// Adds an error handler to the server's error handler list.
     ///
-    /// # Arguments
+    /// # Type Parameters
     ///
-    /// - `&ServerConfig` - Server configuration reference
-    /// - `ArcRwLockStream` - Thread-safe TCP stream wrapper
+    /// - `ServerHook` - The handler type that implements `ServerHook`.
     ///
     /// # Returns
     ///
-    /// - `Vec<u8>` - Byte buffer containing the received data
-    pub(super) async fn handle_stream(
-        config: &ServerConfig,
-        stream_lock: ArcRwLockStream,
-    ) -> Vec<u8> {
-        let buffer_size: usize = config.buffer_size.max(SPLIT_REQUEST_BYTES.len());
+    /// - `&Self` - Reference to self for method chaining.
+    pub async fn read_error<H>(&self) -> &Self
+    where
+        H: ServerHook,
+    {
+        self.write()
+            .await
+            .get_mut_read_error()
+            .push(server_hook_factory::<H>());
+        self
+    }
+
+    /// Creates a TCP listener bound to the configured address。
+    ///
+    /// # Returns
+    ///
+    /// - `Result<TcpListener, ServerError>` - The listener on success, or an error on failure.
+    async fn create_tcp_listener(&self) -> Result<TcpListener, ServerError> {
+        let config: ServerConfigData = self.read().await.get_config().get_data().await;
+        let host: String = config.host;
+        let port: u16 = config.port;
+        let addr: String = Self::get_bind_addr(&host, port);
+        TcpListener::bind(&addr)
+            .await
+            .map_err(|e| ServerError::TcpBind(e.to_string()))
+    }
+
+    /// Spawns a new task to handle an incoming connection.
+    ///
+    /// # Arguments
+    ///
+    /// - `ArcRwLockStream` - The stream for the incoming connection.
+    async fn spawn_connection_handler(&self, stream: ArcRwLockStream) {
+        let server: Server = self.clone();
+        let hook: ServerHookList = self.read().await.get_hook().clone();
+        let task_panic: ServerHookList = self.read().await.get_task_panic().clone();
+        let buffer_size: usize = self.read().await.get_config().get_data().await.buffer_size;
+        spawn(async move {
+            server
+                .handle_connection(stream, hook, task_panic, buffer_size)
+                .await;
+        });
+    }
+
+    /// Handles an incoming connection by processing it through the hook chain.
+    ///
+    /// # Arguments
+    ///
+    /// - `ArcRwLockStream` - The stream for the connection.
+    /// - `ServerHookList` - The list of hooks to process.
+    /// - `ServerHookList` - The list of panic handlers.
+    /// - `usize` - The buffer size for reading data.
+    async fn handle_connection(
+        &self,
+        stream: ArcRwLockStream,
+        hook: ServerHookList,
+        task_panic: ServerHookList,
+        buffer_size: usize,
+    ) {
+        let request: Request = match self.read_stream(&stream, buffer_size).await {
+            Ok(data) => data,
+            Err(e) => {
+                self.read_error_handle(e.to_string()).await;
+                return;
+            }
+        };
+        let ctx: Context = self.create_context(stream, request).await;
+
+        for h in hook.iter() {
+            let ctx_clone: Context = ctx.clone();
+            let h_clone: ServerHookHandler = Arc::clone(h);
+            let join_handle: JoinHandle<()> = spawn(async move {
+                h_clone(ctx_clone).await;
+            });
+
+            match join_handle.await {
+                Ok(()) => {}
+                Err(e) if e.is_panic() => {
+                    for panic_handler in task_panic.iter() {
+                        panic_handler(ctx.clone()).await;
+                    }
+                    break;
+                }
+                Err(_) => break,
+            }
+        }
+    }
+
+    /// Reads data from the stream into a request.
+    ///
+    /// # Arguments
+    ///
+    /// - `&ArcRwLockStream` - The stream to read from.
+    /// - `usize` - The buffer size for reading.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Request, ServerError>` - The request data on success, or an error on failure.
+    async fn read_stream(
+        &self,
+        stream: &ArcRwLockStream,
+        buffer_size: usize,
+    ) -> Result<Request, ServerError> {
         let mut buffer: Vec<u8> = Vec::new();
         let mut tmp_buf: Vec<u8> = vec![0u8; buffer_size];
-        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
-        while let Ok(n) = stream.read(&mut tmp_buf).await {
-            let old_len: usize = tmp_buf.len();
-            tmp_buf = remove_trailing_zeros(&mut tmp_buf);
-            let new_len: usize = tmp_buf.len();
-            if n == 0 {
-                break;
+        let mut stream_guard: ArcRwLockWriteGuard<'_, TcpStream> = stream.write().await;
+        loop {
+            match stream_guard.read(&mut tmp_buf).await {
+                Ok(0) => break,
+                Ok(n) => {
+                    buffer.extend_from_slice(&tmp_buf[..n]);
+                    if tmp_buf[..n].ends_with(SPLIT_REQUEST_BYTES) {
+                        let end_pos: usize = buffer.len().saturating_sub(SPLIT_REQUEST_BYTES.len());
+                        buffer.truncate(end_pos);
+                        break;
+                    }
+                    if n < tmp_buf.len() {
+                        break;
+                    }
+                }
+                Err(e) => {
+                    return Err(ServerError::TcpRead(e.to_string()));
+                }
             }
-            if old_len != new_len || tmp_buf.ends_with(SPLIT_REQUEST_BYTES) {
-                buffer.extend_from_slice(&tmp_buf[..n - SPLIT_REQUEST_BYTES.len()]);
-                break;
-            }
-            buffer.extend_from_slice(&tmp_buf[..n]);
         }
-        buffer
+        Ok(buffer)
+    }
+
+    /// Creates a context for processing a request.
+    ///
+    /// # Arguments
+    ///
+    /// - `ArcRwLockStream` - The stream for the connection.
+    /// - `Request` - The request data.
+    ///
+    /// # Returns
+    ///
+    /// - `Context` - The created context.
+    async fn create_context(&self, stream: ArcRwLockStream, request: Request) -> Context {
+        let mut data: ContextData = ContextData::new();
+        data.stream = Some(stream);
+        data.request = request;
+        Context::from(data)
+    }
+
+    /// Handles an read error by invoking the configured error handlers.
+    ///
+    /// # Arguments
+    ///
+    /// - `String` - The error message.
+    async fn read_error_handle(&self, error: String) {
+        let error_handlers: ServerHookList = self.read().await.get_read_error().clone();
+        let ctx: Context = Context::new();
+        ctx.set_data("error", error).await;
+        for handler in error_handlers.iter() {
+            handler(ctx.clone()).await;
+        }
     }
 
     /// Starts the server and begins accepting connections.
     ///
     /// # Returns
     ///
-    /// - `&mut Self` - Mutable reference to self for method chaining.
-    pub async fn run(&mut self) -> &mut Self {
-        self.init().await;
-        let config: ServerConfig = self.config.read().await.clone();
-        let host: String = config.host.to_owned();
-        let port: usize = config.port;
-        let addr: String = format!("{host}{COLON_SPACE_SYMBOL}{port}");
-        let tcp_listener: TcpListener = TcpListener::bind(&addr)
-            .await
-            .map_err(|e| ServerError::TcpBindError(e.to_string()))
-            .unwrap();
-        while let Ok((stream, _)) = tcp_listener.accept().await {
-            let stream_lock: ArcRwLockStream = ArcRwLockStream::from_stream(stream);
-            let func_list_arc_lock: ArcRwlockVecBoxFunc = Arc::clone(&self.func_list);
-            let config_arc_lock: ArcRwLockServerConfig = Arc::clone(&self.config);
-            let handle_request = move || async move {
-                let config: ServerConfig = config_arc_lock.read().await.clone();
-                let request: Vec<u8> = Self::handle_stream(&config, stream_lock.clone()).await;
-                let mut ctx: InnerContext = InnerContext::new();
-                ctx.stream = Some(stream_lock.clone());
-                ctx.request = request;
-                let ctx: Context = Context::from_inner_context(ctx);
-                for func in func_list_arc_lock.read().await.iter() {
-                    func(ctx.clone()).await;
+    /// - `Result<ServerControlHook, ServerError>` - The control hook on success, or an error on failure.
+    pub async fn run(&self) -> Result<ServerControlHook, ServerError> {
+        let tcp_listener: TcpListener = self.create_tcp_listener().await?;
+        let server: Server = self.clone();
+        let (wait_sender, wait_receiver) = channel(());
+        let (shutdown_sender, mut shutdown_receiver) = channel(());
+
+        let accept_connections: JoinHandle<()> = spawn(async move {
+            loop {
+                tokio::select! {
+                    result = tcp_listener.accept() => {
+                        match result {
+                            Ok((stream, _)) => {
+                                let stream: ArcRwLockStream = ArcRwLockStream::from_stream(stream);
+                                server.spawn_connection_handler(stream).await;
+                            }
+                            Err(_) => break,
+                        }
+                    }
+                    _ = shutdown_receiver.changed() => {
+                        break;
+                    }
                 }
-            };
-            tokio::spawn(handle_request());
-        }
-        self
+            }
+            let _ = wait_sender.send(());
+        });
+
+        let wait_hook = Arc::new(move || {
+            let mut wait_receiver_clone = wait_receiver.clone();
+            Box::pin(async move {
+                let _ = wait_receiver_clone.changed().await;
+            }) as Pin<Box<dyn Future<Output = ()> + Send + 'static>>
+        });
+
+        let shutdown_hook = Arc::new(move || {
+            let shutdown_sender_clone: Sender<()> = shutdown_sender.clone();
+            Box::pin(async move {
+                let _ = shutdown_sender_clone.send(());
+            }) as Pin<Box<dyn Future<Output = ()> + Send + 'static>>
+        });
+
+        spawn(async move {
+            let _ = accept_connections.await;
+        });
+
+        Ok(ServerControlHook {
+            wait_hook,
+            shutdown_hook,
+        })
+    }
+}
+
+/// Implementation of methods for the ServerControlHook structure.
+impl ServerControlHook {
+    /// Waits for the server to finish.
+    pub async fn wait(&self) {
+        (self.wait_hook)().await;
     }
 
-    /// Initializes the panic hook to use the configured error handler.
-    ///
-    /// # Returns
-    ///
-    /// - `()` - This function does not return any meaningful value.
-    async fn init_panic_hook(&self) {
-        let error_handle: ArcErrorHandle = self.config.read().await.error_handle.clone();
-        set_hook(Box::new(move |err| {
-            let data: String = err.to_string();
-            error_handle(data);
-        }));
-    }
-
-    /// Initializes server components including panic hook.
-    ///
-    /// # Returns
-    ///
-    /// - `()` - This function does not return any meaningful value.
-    async fn init(&self) {
-        self.init_panic_hook().await;
+    /// Initiates a graceful shutdown of the server.
+    pub async fn shutdown(&self) {
+        (self.shutdown_hook)().await;
     }
 }

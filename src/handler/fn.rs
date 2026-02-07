@@ -1,13 +1,19 @@
-/// Prints error message to stderr and flushes the buffer.
+use crate::*;
+
+/// Creates a handler function from an async function.
 ///
 /// # Arguments
 ///
-/// - `String` - Error message to be printed.
+/// - `Fn(Context) -> Fut + Send + Sync + 'static` - The async function to wrap.
+/// - `Future<Output = ()> + Send + 'static` - The future type returned by the function.
 ///
 /// # Returns
 ///
-/// - `()` - This function does not return any meaningful value.
-pub(crate) fn print_error_handle(error: String) {
-    eprintln!("{error}");
-    let _ = std::io::Write::flush(&mut std::io::stderr());
+/// - `HandlerFunc` - A boxed handler function.
+pub fn handler_fn<F, Fut>(func: F) -> HandlerFunc
+where
+    F: Fn(Context) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = ()> + Send + 'static,
+{
+    Box::new(move |ctx| Box::pin(func(ctx)))
 }

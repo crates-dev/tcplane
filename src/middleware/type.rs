@@ -1,3 +1,1 @@
-use crate::*;
-
-pub type FuncListArcLock = AsyncArcRwLock<Vec<BoxFunc>>;
+pub use crate::{ServerHookHandler as MiddlewareHandler, ServerHookList as MiddlewareList};
