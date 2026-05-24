@@ -28,7 +28,7 @@ impl ServerData {
     /// # Returns
     ///
     /// - `&ServerConfig` - Reference to the configuration.
-    pub(crate) fn get_config(&self) -> &ServerConfigData {
+    pub fn get_config(&self) -> &ServerConfigData {
         &self.server_config
     }
 
@@ -46,7 +46,7 @@ impl ServerData {
     /// # Returns
     ///
     /// - `&ServerHookList` - Reference to the hook list.
-    pub(crate) fn get_hook(&self) -> &ServerHookList {
+    pub fn get_hook(&self) -> &ServerHookList {
         &self.hook
     }
 
@@ -64,7 +64,7 @@ impl ServerData {
     /// # Returns
     ///
     /// - `&ServerHookList` - Reference to the task panic handler list.
-    pub(crate) fn get_task_panic(&self) -> &ServerHookList {
+    pub fn get_task_panic(&self) -> &ServerHookList {
         &self.task_panic
     }
 
@@ -82,7 +82,7 @@ impl ServerData {
     /// # Returns
     ///
     /// - `&ServerHookList` - Reference to the read error handler list.
-    pub(crate) fn get_read_error(&self) -> &ServerHookList {
+    pub fn get_read_error(&self) -> &ServerHookList {
         &self.read_error
     }
 
@@ -119,7 +119,7 @@ impl Server {
     /// # Returns
     ///
     /// - `ArcRwLockReadGuard<ServerData>` - The read guard.
-    pub(crate) async fn read(&self) -> ArcRwLockReadGuard<'_, ServerData> {
+    pub async fn read(&self) -> ArcRwLockReadGuard<'_, ServerData> {
         self.0.read().await
     }
 

@@ -6,7 +6,7 @@ use crate::*;
 /// including configuration and handler list. It is not intended to be used directly by end-users,
 /// but rather wrapped within the `Server` struct for thread-safe access.
 #[derive(Clone)]
-pub(crate) struct ServerData {
+pub struct ServerData {
     /// Stores the server's configuration settings, such as address, port, and buffer size.
     pub(crate) server_config: ServerConfigData,
     /// A collection of request hooks that are invoked for each incoming connection.

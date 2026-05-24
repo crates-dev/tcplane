@@ -5,7 +5,7 @@ use crate::*;
 /// This structure holds all the settings for the TCP server,
 /// including network parameters and buffer sizes.
 #[derive(Clone)]
-pub(crate) struct ServerConfigData {
+pub struct ServerConfigData {
     /// The host address the server will bind to.
     pub(crate) host: String,
     /// The port number the server will listen on.
