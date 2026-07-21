@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Creates a handler function from an async function.
 ///

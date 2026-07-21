@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// A thread-safe wrapper around `TcpStream` using `Arc<RwLock<TcpStream>>`.
 ///

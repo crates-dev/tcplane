@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Provides a default implementation for ServerData.
 impl Default for ServerData {
@@ -236,7 +236,7 @@ impl Server {
         let addr: String = Self::get_bind_addr(&host, port);
         TcpListener::bind(&addr)
             .await
-            .map_err(|e| ServerError::TcpBind(e.to_string()))
+            .map_err(|error: IoError| ServerError::TcpBind(error.to_string()))
     }
 
     /// Spawns a new task to handle an incoming connection.

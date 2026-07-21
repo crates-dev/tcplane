@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 impl ArcRwLockStream {
     /// Creates a new `ArcRwLockStream` from an existing `Arc<RwLock<TcpStream>>`.
@@ -62,7 +62,7 @@ impl ArcRwLockStream {
         stream
             .write_all(data.as_ref())
             .await
-            .map_err(|e| ResponseError::WriteError(e.to_string()))?;
+            .map_err(|error: IoError| ResponseError::WriteError(error.to_string()))?;
         Ok(())
     }
 
@@ -92,7 +92,7 @@ impl ArcRwLockStream {
         stream
             .flush()
             .await
-            .map_err(|e| ResponseError::FlushError(e.to_string()))?;
+            .map_err(|error: IoError| ResponseError::FlushError(error.to_string()))?;
         Ok(())
     }
 
@@ -138,7 +138,7 @@ impl ArcRwLockStream {
         stream
             .shutdown()
             .await
-            .map_err(|e| ResponseError::WriteError(e.to_string()))?;
+            .map_err(|error: IoError| ResponseError::WriteError(error.to_string()))?;
         Ok(())
     }
 

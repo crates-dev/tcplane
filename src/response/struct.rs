@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Represents an HTTP-like response structure.
 ///

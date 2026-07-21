@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 impl ServerHook for GreetingHandler {
     async fn new(_: &Context) -> Self {

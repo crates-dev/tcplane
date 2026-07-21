@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implementation of server hook handler factory functions.
 /// Creates a server hook handler factory from a type implementing `ServerHook`.

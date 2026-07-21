@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implementation of methods for the Response structure.
 impl Response {

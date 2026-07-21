@@ -32,6 +32,7 @@ use std::{
     error::Error as StdError,
     fmt::{self, Display},
     future::Future,
+    io::Error as IoError,
     net::SocketAddr,
     pin::Pin,
     sync::Arc,
