@@ -44,7 +44,10 @@ use tokio::{
     spawn,
     sync::{
         RwLock, RwLockReadGuard, RwLockWriteGuard,
-        watch::{Sender, channel},
+        watch::{
+            Sender, channel,
+            error::{RecvError as WatchRecvError, SendError as WatchSendError},
+        },
     },
-    task::JoinHandle,
+    task::{JoinError, JoinHandle},
 };

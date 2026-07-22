@@ -31,7 +31,7 @@ async fn test_server_handler_trait() {
         }
 
         async fn handle(self, ctx: &Context) {
-            let _ = ctx.send("CustomHandler executed").await;
+            let _: () = ctx.send("CustomHandler executed").await;
         }
     }
     let server: Server = Server::new();

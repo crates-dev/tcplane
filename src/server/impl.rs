@@ -398,22 +398,22 @@ impl Server {
                     }
                 }
             }
-            let _ = wait_sender.send(());
+            let _: Result<(), WatchSendError<()>> = wait_sender.send(());
         });
         let wait_hook = Arc::new(move || {
             let mut wait_receiver_clone = wait_receiver.clone();
             Box::pin(async move {
-                let _ = wait_receiver_clone.changed().await;
+                let _: Result<(), WatchRecvError> = wait_receiver_clone.changed().await;
             }) as Pin<Box<dyn Future<Output = ()> + Send + 'static>>
         });
         let shutdown_hook = Arc::new(move || {
             let shutdown_sender_clone: Sender<()> = shutdown_sender.clone();
             Box::pin(async move {
-                let _ = shutdown_sender_clone.send(());
+                let _: Result<(), WatchSendError<()>> = shutdown_sender_clone.send(());
             }) as Pin<Box<dyn Future<Output = ()> + Send + 'static>>
         });
         spawn(async move {
-            let _ = accept_connections.await;
+            let _: Result<(), JoinError> = accept_connections.await;
         });
         Ok(ServerControlHook {
             wait_hook,
