@@ -236,7 +236,7 @@ impl Server {
         let addr: String = Self::get_bind_addr(&host, port);
         TcpListener::bind(&addr)
             .await
-            .map_err(|error: IoError| ServerError::TcpBind(error.to_string()))
+            .map_err(|error: std::io::Error| ServerError::TcpBind(error.to_string()))
     }
 
     /// Spawns a new task to handle an incoming connection.
@@ -398,18 +398,20 @@ impl Server {
                     }
                 }
             }
-            let _: Result<(), WatchSendError<()>> = wait_sender.send(());
+            let _: Result<(), tokio::sync::watch::error::SendError<()>> = wait_sender.send(());
         });
         let wait_hook = Arc::new(move || {
             let mut wait_receiver_clone = wait_receiver.clone();
             Box::pin(async move {
-                let _: Result<(), WatchRecvError> = wait_receiver_clone.changed().await;
+                let _: Result<(), tokio::sync::watch::error::RecvError> =
+                    wait_receiver_clone.changed().await;
             }) as Pin<Box<dyn Future<Output = ()> + Send + 'static>>
         });
         let shutdown_hook = Arc::new(move || {
             let shutdown_sender_clone: Sender<()> = shutdown_sender.clone();
             Box::pin(async move {
-                let _: Result<(), WatchSendError<()>> = shutdown_sender_clone.send(());
+                let _: Result<(), tokio::sync::watch::error::SendError<()>> =
+                    shutdown_sender_clone.send(());
             }) as Pin<Box<dyn Future<Output = ()> + Send + 'static>>
         });
         spawn(async move {

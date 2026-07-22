@@ -12,7 +12,6 @@ mod config;
 mod context;
 mod error;
 mod handler;
-mod middleware;
 mod request;
 mod response;
 mod server;
@@ -20,8 +19,8 @@ mod stream;
 mod utils;
 
 pub use {
-    common::*, config::*, context::*, error::*, handler::*, middleware::*, request::*, response::*,
-    server::*, stream::*, utils::*,
+    common::*, config::*, context::*, error::*, handler::*, request::*, response::*, server::*,
+    stream::*, utils::*,
 };
 
 pub use tokio;
@@ -29,10 +28,8 @@ pub use tokio;
 use std::{
     any::Any,
     collections::HashMap,
-    error::Error as StdError,
     fmt::{self, Display},
     future::Future,
-    io::Error as IoError,
     net::SocketAddr,
     pin::Pin,
     sync::Arc,
@@ -42,12 +39,6 @@ use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     net::{TcpListener, TcpStream},
     spawn,
-    sync::{
-        RwLock, RwLockReadGuard, RwLockWriteGuard,
-        watch::{
-            Sender, channel,
-            error::{RecvError as WatchRecvError, SendError as WatchSendError},
-        },
-    },
+    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard, watch::Sender, watch::channel},
     task::{JoinError, JoinHandle},
 };
